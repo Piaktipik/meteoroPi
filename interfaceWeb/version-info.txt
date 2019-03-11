@@ -1,0 +1,7 @@
+vension funcional con mensaje eventos asicronos, estilo mejorado
+
++ intento de comunicasion multi modulos
+
++ puerto 80
+
++ proteccion maximo numero de llamadas a funciones

@@ -1,0 +1,51 @@
+{% extends "interface-layout.html" %}
+{% block body %}
+
+  <h1> {{padre}} </h1>
+
+  <ul class="list-group" id="Objetos">
+
+  {% for fun in funciones %}
+    <li class="list-group-item">
+      <div>
+        <form id="emit" method="POST" class ="boton-funciones" action="#">
+          <input type="submit" class="boton-funcion" value="{{ fun.NombreFuncion }}">
+          <input type="text" class="valores-entrada" name="idPadreFun" value="{{ fun.NombreObjetoPadreFuncion }}">
+          <input type="text" class="valores-entrada" name="nomFun" value="{{ fun.NombreFuncion }}">
+        </form>
+      </div>
+    </li>
+  {% else %}
+  {% endfor %}
+
+  {% for var in variables %}
+    <li class="list-group-item {% if var.EstadoVariable == True %} variable-activa {% else %} variable-inactiva {% endif%}">
+      <h2 >
+        {{ var.NombreVariable }} {% if var.EstadoVariable == True %} : Activo {% else %} : Inactivo {% endif%}
+      </h2>
+    </li>
+  {% else %}
+  {% endfor %}
+
+  {% for obj in objetos %}
+    <li class="list-group-item">
+      <h2>
+        <a href="{{ url_for('get_obj') }}?id={{ obj.id }}">{{ obj.NombreObjeto }}</a>
+      </h2>
+    </li>
+  {% else %}
+  {% endfor %}
+
+  {% if not objetos and not funciones and not variables %}
+      <div class="alert alert-info" role="alert">
+        <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span>
+        <strong>Oops!</strong> No Hay Elementos Activos Actualmente!
+      </div>
+  {% endif %}
+
+    <!--form id="emit" method="POST" action='#'>
+        <input type="text" name="emit_data" id="emit_data" placeholder="Message">
+        <input type="submit" value="Echo">
+    </form-->
+
+{% endblock %}

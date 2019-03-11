@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <title> Interface </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="image/png" rel="shortcut-icon" href="{{ url_for('static', filename='interface-ojo.png') }}"/>
+    <!-- incluimos estilos -->
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}"/>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+    <!-- incluimos librerias Externas -->
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='socket.io.min.js') }}"></script>
+  </head>
+
+  <body>
+    <!-- mostramos mensajes -->
+    <div id="mensaje-info" class="alert alert-off" role="alert">
+        <div id="log"></div>
+    </div>
+    
+    <!-- Barra de Navegacion -->
+      <div class="barra-nav" >
+        <a class="clearfix" href="{{ url_for('show_obj') }}">
+          <img id="home-logo" src="{{ url_for('static', filename='interface-ojo.png')}}" >
+        </a>
+      </div>
+
+    <!-- lista de funciones -->
+    <div class="page">
+      {% block body %}{% endblock %}
+    </div>
+
+    <!-- incluimos javaScript -->
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='interfaceJs.js') }}" type="text/javascript"></script>
+
+  </body
+</html>

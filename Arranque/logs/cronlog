@@ -1,0 +1,200 @@
+ * Running on http://0.0.0.0:8080/ (Press CTRL+C to quit)
+192.168.0.198 - - [04/May/2016 10:51:47] "GET / HTTP/1.1" 200 -
+192.168.0.198 - - [04/May/2016 10:51:49] "GET /static/bootstrap/css/bootstrap.min.css HTTP/1.1" 304 -
+192.168.0.198 - - [04/May/2016 10:51:49] "GET /static/interface-ojo.png HTTP/1.1" 200 -
+192.168.0.198 - - [04/May/2016 10:51:49] "GET /static/style.css HTTP/1.1" 304 -
+192.168.0.198 - - [04/May/2016 10:51:49] "GET /static/bootstrap/js/bootstrap.min.js HTTP/1.1" 304 -
+192.168.0.198 - - [04/May/2016 10:51:50] "GET /static/bootstrap/fonts/glyphicons-halflings-regular.woff HTTP/1.1" 200 -
+No handlers could be found for logger "sqlalchemy.pool.NullPool"
+192.168.0.198 - - [04/May/2016 10:52:55] "GET / HTTP/1.1" 200 -
+192.168.0.198 - - [04/May/2016 10:52:55] "GET /static/bootstrap/css/bootstrap.min.css HTTP/1.1" 200 -
+192.168.0.198 - - [04/May/2016 10:52:55] "GET /static/style.css HTTP/1.1" 200 -
+192.168.0.198 - - [04/May/2016 10:52:57] "GET /static/bootstrap/js/bootstrap.min.js HTTP/1.1" 200 -
+192.168.0.198 - - [04/May/2016 10:52:57] "GET /static/interface-ojo.png HTTP/1.1" 304 -
+192.168.0.198 - - [04/May/2016 10:52:59] "GET /obj_info?id=1 HTTP/1.1" 200 -
+192.168.0.198 - - [04/May/2016 10:53:01] "GET /eje_fun?id=1&nFun=Apagar HTTP/1.1" 302 -
+192.168.0.198 - - [04/May/2016 10:53:04] "GET /eje_fun?id=1&nFun=Encender HTTP/1.1" 302 -
+192.168.0.198 - - [04/May/2016 10:53:05] "GET /obj_info?id=1 HTTP/1.1" 200 -
+192.168.0.198 - - [04/May/2016 10:53:10] "GET / HTTP/1.1" 200 -
+Iniciando modulo NRF24L01
+Iniciando Recepcion Serial
+Iniciando App
+Iniciando Consulta BD...
+Consulta BD Terminada.
+Iniciando Consulta BD...
+Iniciando Consulta BD...
+Iniciando Consulta BD...
+Iniciando Consulta BD...
+Consulta BD Terminada.
+Consulta BD Terminada.
+Consulta BD Terminada.
+Consulta BD Terminada.
+Iniciando Consulta BD...
+Consulta BD Terminada.
+Recibido Nrf24l01: #18 HOLA-1034834473170
+Direccion Modulo Anterior      : 0.
+Direccion Modulo Nueva Recibida: 1034834473170.
+Enviando Nrf24l01: # 17 HOLA-IDENTIFICATE Exitoso
+Recibido Nrf24l01: #3 -2-
+Recibido Nrf24l01: #32 {"Lampara":[{"Funciones":["Encen
+Recibido Nrf24l01: #17 der","Apagar"]}]}
+Procesando Json... 
+{u'Lampara': [{u'Funciones': [u'Encender', u'Apagar']}]}
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto Principal: Lampara
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto: Lampara Guardado en BD.
+Funciones: 
+Funcion: Encender Guardada en BD.
+Encender
+Funcion: Apagar Guardada en BD.
+Apagar
+Enviando Nrf24l01: # 10 BIENVENIDO  Fallido
+Enviando Nrf24l01: # 10 BIENVENIDO  Fallido
+Enviando Nrf24l01: # 10 BIENVENIDO  Fallido
+Enviando Nrf24l01: # 10 BIENVENIDO  Fallido
+Recibido Nrf24l01: #3 -2-
+Recibido Nrf24l01: #32 {"Lampara":[{"Funciones":["Encen
+Recibido Nrf24l01: #17 der","Apagar"]}]}
+Procesando Json... 
+{u'Lampara': [{u'Funciones': [u'Encender', u'Apagar']}]}
+El Objeto: Lampara ya Existe... Revisando Cambio de estado
+Exception revisarCambioEstado: 'list' object has no attribute 'values'
+Enviando Nrf24l01: # 10 BIENVENIDO Exitoso
+Enviando Nrf24l01: # 4 PING Exitoso
+Evento Ocurrido : El Objeto Lampara, Fue Desactivado
+Exception revisarModulos: int() argument must be a string or a number, not 'NoneType'
+Recibido Nrf24l01: #4 PONG
+Evento Ocurrido : El Objeto Lampara, Fue Activado
+Iniciando Consulta BD...
+Consulta BD Terminada.
+Iniciando Consulta BD...
+Iniciando Consulta BD...
+Consulta BD Terminada.
+Consulta BD Terminada.
+Enviando Nrf24l01: # 4 PING Exitoso
+Recibido Nrf24l01: #4 PONG
+Iniciando Consulta BD...
+Consulta BD Terminada.
+Iniciando Consulta BD...
+Consulta BD Terminada.
+Iniciando Consulta BD...
+consulta objetos id: 1, padre: Lampara
+Consulta BD Terminada.
+Enviando Nrf24l01: # 4 PING Exitoso
+Recibido Nrf24l01: #4 PONG
+Iniciando Consulta BD...
+consulta id objeto: 1, Funcion: Apagar
+{"Lampara":"Apagar"}
+Enviando Nrf24l01: # 20 {"Lampara":"Apagar"} Exitoso
+Consulta BD Terminada.
+Enviando Nrf24l01: # 4 PING Exitoso
+Recibido Nrf24l01: #4 PONG
+Iniciando Consulta BD...
+consulta id objeto: 1, Funcion: Encender
+{"Lampara":"Encender"}
+Enviando Nrf24l01: # 22 {"Lampara":"Encender"} Exitoso
+Consulta BD Terminada.
+Iniciando Consulta BD...
+consulta objetos id: 1, padre: Lampara
+Consulta BD Terminada.
+Enviando Nrf24l01: # 4 PING  Fallido
+Enviando Nrf24l01: # 4 PING  Fallido
+Enviando Nrf24l01: # 4 PING  Fallido
+Enviando Nrf24l01: # 4 PING  Fallido
+Recibido Nrf24l01: #4 PONG
+Enviando Nrf24l01: # 4 PING Exitoso
+Recibido Nrf24l01: #4 PONG
+Iniciando Consulta BD...
+Consulta BD Terminada.
+Enviando Nrf24l01: # 4 PING Exitoso
+Evento Ocurrido : El Objeto Lampara, Fue Desactivado
+Recibido Nrf24l01: #4 PONG
+Evento Ocurrido : El Objeto Lampara, Fue Activado
+Recibido Serial  : #4 HOLA
+Enviando Serial  : #17 HOLA-IDENTIFICATE
+Enviando Nrf24l01: # 4 PING Exitoso
+Recibido Nrf24l01: #4 PONG
+Recibido Serial  : #519 {"Robot":[{"Funciones":["Adelante Evadiendo Obstaculos","Adelante Siguiendo Objeto","Detener","Mover Adelante","Mover Atras","Mover Izquierda","Mover Derecha"]},{"Ultrasonido Izquierdo":[{"Estados":["Estado Ultrasonido Izquierdo"]}]},{"Ultrasonido Frontal":[{"Estados":["Estado Ultrasonido Frontal"]}]},{"Ultrasonido Derecho":[{"Estados":["Estado Ultrasonido Derecho"]}]},{"Sensor Linea Izquierda":[{"Estados":["Estado Sensor Linea Izquierda"]}]},{"Sensor Linea Derecho":[{"Estados":["Estado Sensor Linea Derecho"]}]}]}
+Procesando Json... 
+{u'Robot': [{u'Funciones': [u'Adelante Evadiendo Obstaculos', u'Adelante Siguiendo Objeto', u'Detener', u'Mover Adelante', u'Mover Atras', u'Mover Izquierda', u'Mover Derecha']}, {u'Ultrasonido Izquierdo': [{u'Estados': [u'Estado Ultrasonido Izquierdo']}]}, {u'Ultrasonido Frontal': [{u'Estados': [u'Estado Ultrasonido Frontal']}]}, {u'Ultrasonido Derecho': [{u'Estados': [u'Estado Ultrasonido Derecho']}]}, {u'Sensor Linea Izquierda': [{u'Estados': [u'Estado Sensor Linea Izquierda']}]}, {u'Sensor Linea Derecho': [{u'Estados': [u'Estado Sensor Linea Derecho']}]}]}
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto Principal: Robot
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto: Robot Guardado en BD.
+Funciones: 
+Funcion: Adelante Evadiendo Obstaculos Guardada en BD.
+Adelante Evadiendo Obstaculos
+Funcion: Adelante Siguiendo Objeto Guardada en BD.
+Adelante Siguiendo Objeto
+Funcion: Detener Guardada en BD.
+Detener
+Funcion: Mover Adelante Guardada en BD.
+Mover Adelante
+Funcion: Mover Atras Guardada en BD.
+Mover Atras
+Funcion: Mover Izquierda Guardada en BD.
+Mover Izquierda
+Funcion: Mover Derecha Guardada en BD.
+Mover Derecha
+Objeto: Ultrasonido Izquierdo, Padre: Robot
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto: Ultrasonido Izquierdo Guardado en BD.
+Estados: 
+Estado: Estado Ultrasonido Izquierdo Guardado en BD.
+Estado Ultrasonido Izquierdo
+Objeto: Ultrasonido Frontal, Padre: Robot
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto: Ultrasonido Frontal Guardado en BD.
+Estados: 
+Estado: Estado Ultrasonido Frontal Guardado en BD.
+Estado Ultrasonido Frontal
+Objeto: Ultrasonido Derecho, Padre: Robot
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto: Ultrasonido Derecho Guardado en BD.
+Estados: 
+Estado: Estado Ultrasonido Derecho Guardado en BD.
+Estado Ultrasonido Derecho
+Objeto: Sensor Linea Izquierda, Padre: Robot
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto: Sensor Linea Izquierda Guardado en BD.
+Estados: 
+Estado: Estado Sensor Linea Izquierda Guardado en BD.
+Estado Sensor Linea Izquierda
+Objeto: Sensor Linea Derecho, Padre: Robot
+Exception objetoExiste: 'NoneType' object has no attribute 'NombreObjeto'
+Objeto: Sensor Linea Derecho Guardado en BD.
+Estados: 
+Estado: Estado Sensor Linea Derecho Guardado en BD.
+Estado Sensor Linea Derecho
+Enviando Serial  : #10 BIENVENIDO
+Recibido Serial  : #519 {"Robot":[{"Funciones":["Adelante Evadiendo Obstaculos","Adelante Siguiendo Objeto","Detener","Mover Adelante","Mover Atras","Mover Izquierda","Mover Derecha"]},{"Ultrasonido Izquierdo":[{"Estados":["Estado Ultrasonido Izquierdo"]}]},{"Ultrasonido Frontal":[{"Estados":["Estado Ultrasonido Frontal"]}]},{"Ultrasonido Derecho":[{"Estados":["Estado Ultrasonido Derecho"]}]},{"Sensor Linea Izquierda":[{"Estados":["Estado Sensor Linea Izquierda"]}]},{"Sensor Linea Derecho":[{"Estados":["Estado Sensor Linea Derecho"]}]}]}
+Procesando Json... 
+{u'Robot': [{u'Funciones': [u'Adelante Evadiendo Obstaculos', u'Adelante Siguiendo Objeto', u'Detener', u'Mover Adelante', u'Mover Atras', u'Mover Izquierda', u'Mover Derecha']}, {u'Ultrasonido Izquierdo': [{u'Estados': [u'Estado Ultrasonido Izquierdo']}]}, {u'Ultrasonido Frontal': [{u'Estados': [u'Estado Ultrasonido Frontal']}]}, {u'Ultrasonido Derecho': [{u'Estados': [u'Estado Ultrasonido Derecho']}]}, {u'Sensor Linea Izquierda': [{u'Estados': [u'Estado Sensor Linea Izquierda']}]}, {u'Sensor Linea Derecho': [{u'Estados': [u'Estado Sensor Linea Derecho']}]}]}
+El Objeto: Robot ya Existe... Revisando Cambio de estado
+Exception revisarCambioEstado: 'list' object has no attribute 'values'
+Enviando Serial  : #10 BIENVENIDO
+Recibido Serial  : #519 {"Robot":[{"Funciones":["Adelante Evadiendo Obstaculos","Adelante Siguiendo Objeto","Detener","Mover Adelante","Mover Atras","Mover Izquierda","Mover Derecha"]},{"Ultrasonido Izquierdo":[{"Estados":["Estado Ultrasonido Izquierdo"]}]},{"Ultrasonido Frontal":[{"Estados":["Estado Ultrasonido Frontal"]}]},{"Ultrasonido Derecho":[{"Estados":["Estado Ultrasonido Derecho"]}]},{"Sensor Linea Izquierda":[{"Estados":["Estado Sensor Linea Izquierda"]}]},{"Sensor Linea Derecho192.168.0.198 - - [04/May/2016 10:53:17] "GET / HTTP/1.1" 200 -
+":[{"Estados":["Estado Sensor Linea Derecho"]}]}]}
+Procesando Json... 
+{u'Robot': [{u'Funciones': [u'Adelante Evadiendo Obstaculos', u'Adelante Siguiendo Objeto', u'Detener', u'Mover Adelante', u'Mover Atras', u'Mover Izquierda', u'Mover Derecha']}, {u'Ultrasonido Izquierdo': [{u'Estados': [u'Estado Ultrasonido Izquierdo']}]}, {u'Ultrasonido Frontal': [{u'Estados': [u'Estado Ultrasonido Frontal']}]}, {u'Ultrasonido Derecho': [{u'Estados': [u'Estado Ultrasonido Derecho']}]}, {u'Sensor Linea Izquierda': [{u'Estados': [u'Estado Sensor Linea Izquierda']}]}, {u'Sensor Linea Derecho': [{u'Estados': [u'Estado Sensor Linea Derecho']}]}]}
+Iniciando Consulta BD...
+El Objeto: Robot ya Existe... Revisando Cambio de estado
+Exception revisarCambioEstado: 'list' object has no attribute 'values'
+Enviando Serial  : #10 BIENVENIDO
+Consulta BD Terminada.
+Recibido Serial  : #519 {"Robot":[{"Funciones":["Adelante Evadiendo Obstaculos","Adelante Siguiendo Objeto","Detener","Mover Adelante","Mover Atras","Mover Izquierda","Mover Derecha"]},{"Ultrasonido Izquierdo":[{"Estados":["Estado Ultrasonido Izquierdo"]}]},{"Ultrasonido Frontal":[{"Estados":["Estado Ultrasonido Frontal"]}]},{"Ultrasonido Derecho":[{"Estados":["Estado Ultrasonido Derecho"]}]},{"Sensor Linea Izquierda":[{"Estados":["Estado Sensor Linea Izquierda"]}]},{"Sensor Linea Derecho":[{"Estados":["Estado Sensor Linea Derecho"]}]}]}
+Procesando Json... 
+{u'Robot': [{u'Funciones': [u'Adelante Evadiendo Obstaculos', u'Adelante Siguiendo Objeto', u'Detener', u'Mover Adelante', u'Mover Atras', u'Mover Izquierda', u'Mover Derecha']}, {u'Ultrasonido Izquierdo': [{u'Estados': [u'Estado Ultrasonido Izquierdo']}]}, {u'Ultrasonido Frontal': [{u'Estados': [u'Estado Ultrasonido Frontal']}]}, {u'Ultrasonido Derecho': [{u'Estados': [u'Estado Ultrasonido Derecho']}]}, {u'Sensor Linea Izquierda': [{u'Estados': [u'Estado Sensor Linea Izquierda']}]}, {u'Sensor Linea Derecho': [{u'Estados': [u'Estado Sensor Linea Derecho']}]}]}
+El Objeto: Robot ya Existe... Revisando Cambio de estado
+Exception revisarCambioEstado: 'list' object has no attribute 'values'
+Enviando Serial  : #10 BIENVENIDO
+Recibido Serial  : #519 {"Robot":[{"Funciones":["Adelante Evadiendo Obstaculos","Adelante Siguiendo Objeto","Detener","Mover Adelante","Mover Atras","Mover Izquierda","Mover Derecha"]},{"Ultrasonido Izquierdo":[{"Estados":["Estado Ultrasonido Izquierdo"]}]},{"Ultrasonido Frontal":[{"Estados":["Estado Ultrasonido Frontal"]}]},{"Ultrasonido Derecho":[{"Estados":["Estado Ultrasonido Derecho"]}]},{"Sensor Linea Izquierda":[{"Estados":["Estado Sensor Linea Izquierda"]}]},{"Sensor Linea Derecho":[{"Estados":["Estado Sensor Linea Derecho"]}]}]}
+Procesando Json... 
+{u'Robot': [{u'Funciones': [u'Adelante Evadiendo Obstaculos', u'Adelante Siguiendo Objeto', u'Detener', u'Mover Adelante', u'Mover Atras', u'Mover Izquierda', u'Mover Derecha']}, {u'Ultrasonido Izquierdo': [{u'Estados': [u'Estado Ultrasonido Izquierdo']}]}, {u'Ultrasonido Frontal': [{u'Estados': [u'Estado Ultrasonido Frontal']}]}, {u'Ultrasonido Derecho': [{u'Estados': [u'Estado Ultrasonido Derecho']}]}, {u'Sensor Linea Izquierda': [{u'Estados': [u'Estado Sensor Linea Izquierda']}]}, {u'Sensor Linea Derecho': [{u'Estados': [u'Estado Sensor Linea Derecho']}]}]}
+El Objeto: Robot ya Existe... Revisando Cambio de estado
+Exception revisarCambioEstado: 'list' object has no attribute 'values'
+Enviando Serial  : #10 BIENVENIDO
+Recibido Serial  : #519 {"Robot":[{"Funciones":["Adelante Evadiendo Obstaculos","Adelante Siguiendo Objeto","Detener","Mover Adelante","Mover Atras","Mover Izquierda","Mover Derecha"]},{"Ultrasonido Izquierdo":[{"Estados":["Estado Ultrasonido Izquierdo"]}]},{"Ultrasonido Frontal":[{"Estados":["Estado Ultrasonido Frontal"]}]},{"Ultrasonido Derecho":[{"Estados":["Estado Ultrasonido Derecho"]}]},{"Sensor Linea Izquierda":[{"Estados":["Estado Sensor Linea Izquierda"]}]},{"Sensor Linea Derecho":[{"Estados":["Estado Sensor Linea Derecho"]}]}]}
+Procesando Json... 
+{u'Robot': [{u'Funciones': [u'Adelante Evadiendo Obstaculos', u'Adelante Siguiendo Objeto', u'Dete192.168.0.198 - - [04/May/2016 10:53:19] "GET /obj_info?id=2 HTTP/1.1" 200 -

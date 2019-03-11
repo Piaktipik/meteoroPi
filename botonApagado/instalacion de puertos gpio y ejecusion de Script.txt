@@ -1,0 +1,14 @@
+informacion tomada de:
+
+http://www.instructables.com/id/Simple-Raspberry-Pi-Shutdown-Button/?ALLSTEPS
+https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
+
+sudo apt-get install python-dev python-rpi.gpio
+
+
+-- ejecutar el script al arranque --
+- entramos al siguinte archivo
+sudo nano /etc/rc.local
+
+- añadimos la siguiente linea antes de: exit 0
+python /home/pi/off_button.py

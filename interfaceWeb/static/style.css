@@ -1,0 +1,108 @@
+/*cuerpo del documento*/
+body
+{
+    font-family: sans-serif;
+    background: #e7e7e2;
+    z-index:0;
+}
+
+/*mensaje que informa cualquier cambio*/
+.alert-off{
+    display:none;
+    position:fixed;
+    margin-top: -100em;
+}
+
+.alert-on{
+    margin-top: -2em;
+    color: #3c763d;
+    width: 100%;
+    opacity:1;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    display:block;
+    position:fixed;
+    font-size: 1em;
+    z-index:1;
+}
+
+/* barra con la imagen de la HAL9000 - HOME*/
+.barra-nav{
+    margin-top: 2em;
+    width: 100%;
+    height:5em;
+    text-align:center;
+}
+
+#home-logo {
+    height:100%;
+}
+
+
+.page{
+    margin: 2em auto;
+    width: 95%;
+    border: 5px solid #ccc;
+    padding: 0.8em;
+    background: white;
+    text-align:center;
+
+}
+
+
+h1 {
+    font-family: 'Georgia', serif; margin: 0;
+    font-size: 2em;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    color: #373737;
+}
+
+h2 {
+    font-size: 1em;
+    margin-bottom: 20px;
+}
+
+.list-group-item{
+    color: #377BA8;
+    width: 100%;
+    height: 100%;
+    font-size: 1.5em;
+}
+
+.boton-funcion{
+    border:none;
+    background:none;
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+
+input:disabled {
+    color: #87878A;
+    border:none;
+    background:none;
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+.valores-entrada{
+    display:none;
+}
+
+.variable-activa{
+    color: rgb(255,255,255);
+    background:rgb(0,0,255); 
+}
+
+
+.variable-inactiva{
+    color: rgb(255,255,255);
+    background:rgb(255,0,0); 
+}
+
+
+
+
