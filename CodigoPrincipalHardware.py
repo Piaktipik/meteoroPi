@@ -13,8 +13,8 @@ import csv
 
 ###################################### Parametros Codigo ##################################################
 # Parametros codigo:
-tcap = 30 # Tiempo caputura fotogramas en segundos
-tencap = 30 # Tiempo entre capturas en segundos
+tcap = 5 # Tiempo caputura fotogramas en segundos
+tencap = 54 # Tiempo entre capturas en segundos
     
 # Contador capturas
 rutaCon = "/home/pi/allSky/conteo.txt"
@@ -49,9 +49,8 @@ GPIO.setup(led_amar, GPIO.OUT)
 GPIO.setup(led_verd, GPIO.OUT)
 GPIO.setup(ena_easy, GPIO.OUT)
 
-#puertoSerial = '/dev/ttyUSB0'
-puertoSerial = '/dev/ttyACM0'
-gpsInstalado = True
+puertoSerial = '/dev/ttyUSB0'
+gpsInstalado = False
 
 ###################################### Funciones ##################################################
 def mix2bytes(datosE,pos):
@@ -317,7 +316,7 @@ try:
             GPIO.output(led_verd,GPIO.LOW)
 
             # Creamos sistema de archivos
-            ruta = '/media/pi/4D59-20AF/fotosCieloAllSky/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
+            ruta = '/media/pi/MUSEO2/fotosCieloAllSky/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
             #ruta = '/home/pi/Desktop/fotosCieloAllSky/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
             ensure_dir(ruta)
 
@@ -341,9 +340,9 @@ try:
             sleep(tcap)		#dormimos el resto de tiempo hasta timeEntreF
 
             # Cerramos VLC
-            #os.system("sudo killall vlc")
+            os.system("sudo killall vlc")
             GPIO.output(led_amar,GPIO.LOW)
-            #sleep(2) # Esperamos unos segundos que cierre
+            sleep(2) # Esperamos unos segundos que cierre
             
             # reiniciamos indicadores
             GPIO.output(led_rojo,GPIO.LOW)
