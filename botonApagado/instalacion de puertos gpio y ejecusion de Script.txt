@@ -10,5 +10,5 @@ sudo apt-get install python-dev python-rpi.gpio
 - entramos al siguinte archivo
 sudo nano /etc/rc.local
 
-- añadimos la siguiente linea antes de: exit 0
-python /home/pi/off_button.py
+- aï¿½adimos la siguiente linea antes de: exit 0
+python /home/pi/meteoroPi/botonApagado/off_button.py &

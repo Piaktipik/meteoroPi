@@ -1,7 +1,5 @@
 
 #!/bin/python
-
-
 ###################################### Librerias ##################################################
 import os
 from time import gmtime, strftime, localtime, strptime, time, sleep#, timedelta
@@ -11,16 +9,80 @@ import threading
 import serial
 import csv
 
-###################################### Parametros Codigo ##################################################
-# Parametros codigo:
+###################################### Parametros ##################################################
+###################################### Parametros Estacion:
+tipEstacion = 0 # Tipo de estacion (Por defecto pruebas)
+# Tipo  :Capturador :GPS    :Davis      : Caso
+# 0     :no         :no     :simulada   : Pruebas Julian
+# 1     :no         :no     :real       : ITM
+# 2     :easycap    :si     :real       : UdeA Oriente
+
+tipoCapturador = [False,False,True] 
+tipoGPS        = [False,False,True]
+tipoDavis      = [False,True,True]
+
+# Notas: GPS instalado en puerto serial GPIO raspberry
+
+###################################### Parametros Muestreo:
 tcap = 5 # Tiempo caputura fotogramas en segundos
 tencap = 54 # Tiempo entre capturas en segundos
-    
-# Contador capturas
-rutaCon = "/home/pi/allSky/conteo.txt"
-rutaLog = "/home/pi/allSky/logSkyCam.txt"
-rutaLogD = "/home/pi/allSky/davisLog/DavisLog.txt"
 
+###################################### Parametros Nombres archivos:
+# Se indican los nombres de los archivos 
+# Archivos para almacenar informacion
+arcConteo = "conteo"
+arcEstacion = "estacion"
+# Archivos log
+arcLogCapturaImagen = "logCam"
+arcLogCapturaDavis = "logDavis"
+
+###################################### Parametros Rutas:
+rutaMeteoroPi = "/home/pi/meteoroPi/"
+rutaImagenes = "/media/pi/FOTOS/"
+
+carpetaConfigurciones = "config/"
+carpetaLogs = "logs/"
+carpetaDatos = "datos/"
+carpetaImagenes = "fotosCamara/"
+
+# Se definen las rutas de los archivos de configuracion
+rutaCon = rutaMeteoroPi + carpetaConfigurciones + arcConteo + ".txt"
+rutaEst = rutaMeteoroPi + carpetaConfigurciones + arcEstacion + ".txt"
+# En estas rutas se guardan los logs
+rutaLog = rutaMeteoroPi + carpetaLogs + arcLogCapturaImagen + ".txt"
+rutaLogD = rutaMeteoroPi + carpetaLogs + arcLogCapturaDavis + ".txt"
+# Se definen las rutas donde se guardan los datos
+rutaDatos = rutaMeteoroPi + carpetaDatos 
+rutaImg = rutaImagenes + carpetaImagenes
+
+# Verificacion rutas guardado archivos
+def ensure_dir(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
+
+# Registro actividad en .txt y consola
+def regLog(texto):
+    print (texto)
+    ensure_dir(rutaLog)
+    fileL = open(rutaLog, "a")   # se crea el archivo 
+    fileL.write(texto + '\n') 
+    fileL.close() 
+
+###################################### Verificacion de tipo de estacion
+try: # exepcion no existencia archivo
+    file = open(rutaEst, "r")
+    tipEstacionL  = file.read() 
+    tipEstacion = int(tipEstacionL)
+except:
+    ensure_dir(rutaEst)
+    file = open(rutaEst, "w+")   # Se crea el archivo 
+    file.write(str(tipEstacion)) 
+    file.close() 
+regLog("Tipo Estacion Cargado: " + str(tipEstacion))
+
+
+# Parametros estructura trama estacion Davis Vantage Pro 2:
 Nombres = ['L','O','O','Bar Trend','Packet Type','Next Record','Barometer','Inside Temperature','Inside Humidity','Outside Temperature','Wind Speed','10 Min Avg Wind Speed','Wind Direction','Extra Temperatures','Soil Temperatures','Leaf Temperatures','Outside Humidity','Extra Humidties','Rain Rate','UV','Solar Radiation','Storm Rain','Start Date of current Storm','Day Rain','Month Rain','Year Rain','Day ET','Month ET','Year ET','Soil Moistures','Leaf Wetnesses','Inside Alarms','Rain Alarms','Outside Alarms','Extra Temp/Hum Alarms','Soil & Leaf Alarms','Transmitter Battery Status','Console Battery Voltage','Forecast Icons','Forecast Rule number','Time of Sunrise','Time of Sunset','<LF> = 0x0A','<CR> = 0x0D','CRC']
 Doff    = [1, 2, 3, 4, 5, 6, 8, 10, 12, 13, 15, 16, 17, 19, 26, 30, 34, 35, 42, 44, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 67, 71, 72, 73, 75, 83, 87, 88, 90, 91, 92, 94, 96, 97, 98]
 Dsize   = [1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 1, 1, 2, 7, 4, 4, 1, 7, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 1, 1, 2, 8, 4, 1, 2, 1, 1, 2, 2, 1, 1, 2]
@@ -29,47 +91,39 @@ DSave   = [0,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 TamD = len(Nombres)
 
 ###################################### Variables ##################################################                
-# variables captura tiempo 
-
+# Variables captura tiempo 
 tiempoS = [2000, 0, 0, 0, 0, 0]
 tiempoG = [2000, 0, 0, 0, 0, 0]
 tiempo = [2000, 0, 0, 0, 0, 0]
 stopT1 = False
 
 ###################################### Puertos ###################################### 
+# Puertos leds indicadores estado captura imagenes
 led_rojo = 19
 led_amar = 13
 led_verd = 6
-ena_easy = 12
+ena_easy = 12       # Puerto activacion capturador de video
 
-GPIO.setmode(GPIO.BCM)
 
+GPIO.setmode(GPIO.BCM)          # Seleccionamos modo de identificacion de puertos BCM ( https://raspberrypi.stackexchange.com/questions/12966/what-is-the-difference-between-board-and-bcm-for-gpio-pin-numbering )
+# Se configuran los puertos como salidas
 GPIO.setup(led_rojo, GPIO.OUT)
 GPIO.setup(led_amar, GPIO.OUT)
 GPIO.setup(led_verd, GPIO.OUT)
 GPIO.setup(ena_easy, GPIO.OUT)
 
-puertoSerial = '/dev/ttyUSB0'
-gpsInstalado = False
+# Identificamos el puerto USB estacion Davis 
+if tipoDavis[tipEstacion]:
+    puertoSerial = ['/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3']    # Davis Real
+else:
+    puertoSerial = ['/dev/ttyACM0','/dev/ttyACM1','/dev/ttyACM2','/dev/ttyACM3']    # Pruebas arduino
 
 ###################################### Funciones ##################################################
+# Mezcla bytes de la trama entregada por la estacion Davis
 def mix2bytes(datosE,pos):
   return ord(datosE[pos + 1]) * 256 + ord(datosE[pos])
 
-# Registro suscesos en Txt y consola
-def regLog(texto):
-    print (texto)
-    fileL = open(rutaLog, "a")   # se crea el archivo 
-    fileL.write(texto + '\n') 
-    fileL.close() 
-
-# Verificacion rutas guardado archivos
-def ensure_dir(f):
-    d = os.path.dirname(f)
-    if not os.path.exists(d):
-        os.makedirs(d)
-
-# Actualizamos tiempo sistema
+# Actualiza tiempo sistema entre GPS (Si esta activo y tiempo sistema)
 def actualizarTiempo():
     # Extraemos tiempo sistema
     tiempoS[0] = int(strftime("%Y", localtime()))
@@ -89,7 +143,9 @@ def actualizarTiempo():
             return tiempo
     return tiempoS
 
-# hilo de captura tiempo GPS
+
+###################################### Hilos codigo
+# Hilo de captura tiempo GPS
 def worker():
     """funcion que realiza el trabajo en el thread"""
     #Listen on port 2947 (gpsd) of localhost
@@ -124,54 +180,66 @@ def worker():
             regLog("GPSD has terminated")
     return
 
-# hilo Captura datos Estacion
+# Hilo Captura datos Estacion
 def capturaEstacion():
     ###################################### Guardamos Datos Estacion
-    serialOperativo = False
-    ultimoMinuto=0
-    tiempo = actualizarTiempo()
+    serialOperativo = False     # Se entiende como inactiva la conexion con la estacion Davis
+    ser = None                  # Limpiamos conexion comunicacion serial Davis
+    ultimoMinuto=0              # Se inicializa variable usada para captura cada minuto
+    tiempo = actualizarTiempo() # Se inicializa el tiempo del sistema
     
     while(1):
+
+        # Intentamos correr el codigo de captura de datos de la estacion Davis
         try:
             
-            # si ultimo minuto fue capturado, esperamos el while
+            # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
             while ultimoMinuto == tiempo[4]:
                 tiempo = actualizarTiempo()
                 sleep(1)
-            
+
+            # Pasado un minuto procedemos a solicitar un dato de la estacion
+            nPuertoSerial = 0
             if serialOperativo:
-                
+                # Si la comunicacion serial esta activa ->
+
+                # Vaciamos buffer puerto Serial
                 while (ser.in_waiting > 0):
                     ser.read()
+
+                ###################################### Solicitamos una trama LOOP a la estacion:
                 regLog('Solicitando LOOP: ')
                 ser.write(b'\n')
                 ser.write(b'\n')
-                sleep(0.1)
                 ser.write(b'LOOP 1') 
-                sleep(0.1)
-                x = ser.read(100)          # read 99 bytes
                 ser.flush()
+
+                # Leemos la trama LOOP 
+                x = ser.read(100)          # read 99 bytes
+                # Reportamos los datos leidos
                 regLog('Lectura: ')
                 regLog(x)
 
-                # Creamos sistema de archivos
-                ruta = '/home/pi/allSky/davisLog/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
+                # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
+                ruta = rutaDatos + 'davis/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
                 ensure_dir(ruta)
 
-                # Se carga el tiempo
+                ###################################### Se carga el tiempo 
+                # En el nombre del archivo  en formato pandas YY-MM-DD HH:MM:SS
                 nombreArchivo = 'DatosEstacion' + str(tiempo[0]) + '-' + "%02d"%tiempo[1] + '-' + "%02d"%tiempo[2] 
+                # En formato pandas YY-MM-DD HH:MM:SS para la captura actual
                 tiempoStr = str(tiempo[0]) + '-' + "%02d"%tiempo[1] + '-' + "%02d"%tiempo[2]  + ' ' + "%02d"%tiempo[3] + ':' + "%02d"%tiempo[4] + ':' + "%02d"%tiempo[5] 
-                regLog("nCaptura... " + ruta + " T: " + tiempoStr)
+                # Se reporta tiempo captura
+                regLog("nCaptura... " + ruta + " T: " + tiempoStr + " Procesando trama...")
 
-                #Procesamos los datos Capturados
-                #regLog('Procesando Datos: ')
-                #regLog('# Datos Capturados' + str(len(x)))
-                #xe = x.encode('ASCII') 
+                ###################################### Procesamos los datos Capturados
                 Datos = [tiempoStr]     # Cargamos el tiempo como primera columna
+                # Se verifica que el tamano sea valido
                 if len(x) > 99:
-                    if(x[1]!='L'):      # Si el paquete llega con problema lo descartamos
-                        continue
-                        
+                    if(x[1]!='L'):      # Se verifica que el paquete inicie con L (de la trama LOOP)
+                        continue        # Si no es correcto se solicita un nuevo paquete
+                    
+                    ###################################### Recorremos, y alistamos datos para almacenamiento
                     for i in range(TamD):
                         aux = '0'
                         #regLog(Nombres[i] + ' Save:' +  str(DSave[i]) + ' * [' + str(DFact[i])+ ']')
@@ -186,13 +254,14 @@ def capturaEstacion():
                         if DSave[i] == 1:
                             Datos.append(aux)
                 else:
-                    regLog('Captura Incompleta... Reintentando')
-                    if serialOperativo:
-                        continue
+                    # Si no es correcto se solicita un nuevo paquete
+                    regLog('# Datos < 100, Captura Incompleta... Reintentando')
+                    continue
                 
-
-                #Guardamos los datos Capturados
+                # Si los datos tienen el inicio y cantidad correcta los guardamos
+                ###################################### Guardamos los datos Capturados
                 fileName = ruta + nombreArchivo + '.csv'
+                 # Intentamos abrir archivo 
                 try:
                     #regLog('Abriendo archivo...' + fileName)
                     open(fileName, 'rb')
@@ -200,40 +269,54 @@ def capturaEstacion():
                     # Archivo no existe, lo creamos
                     print('Error apertura... Creando archivo')
                     writer = csv.writer(open(fileName, 'w'))
+
                     # Cargamos nombres headers
                     headers = ['Tiempo Sistema'] # Cargamos el tiempo como primera columna
                     for i in range(TamD):
                         if DSave[i] == 1:
                             headers.append(Nombres[i])
-                    regLog('Cabecera a escribir: ' + str(headers))
+                    #regLog('Cabecera a escribir: ' + str(headers))
+
+                    # Cargamos cabecera del .CSV
                     writer.writerow(headers)
 
+                # Abrimos el archivo
                 writer = csv.writer(open(fileName, 'a'))
                 #regLog('Datos a escribir: ' + str(Datos))
                 writer.writerow(Datos)
                 regLog('Datos Guardados')
-                # indicamos que ya se guardo datos para este minuto
+
+                # Todo salido bien!, indicamos que ya se guardo datos para este minuto
                 ultimoMinuto = tiempo[4]
                 
+            # Si no hay conexion serial:
             else:
-                # inicializacion puerto Serial
-                regLog('Iniciado Puerto... ' + puertoSerial)
+                # Se reporta el puerto a iniciar
+                regLog('Iniciado Puerto... ' + puertoSerial[nPuertoSerial])
                 try:
-                    if not gpsInstalado:
-                        # forzamos la detencion del modulo del GPS que ocupa el puerto serial de la estacion
+                    if not tipoGPS[tipEstacion]:
+                        # Forzamos la detencion de la libreria GPS, ya que por defecto ocupa el puerto serial de la estacion
                         os.system(''' pgrep gpsd | awk '{system("sudo kill "$1)}' ''')
-                    ser = serial.Serial(puertoSerial, 19200, timeout=5)
-                    print(ser.name)
+                    
+                    # Se crea el puerto
+                    ser = serial.Serial(puertoSerial[nPuertoSerial], 19200, timeout=5)
+                    # Se reporta el puerto iniciado
+                    regLog(ser.name)
                     serialOperativo = True
                     regLog('Iniciado')
+
                 except Exception as e:
+                    # Si ocurre un error iniciando el puerto serial, lo reportamos
                     serialOperativo = False
-                    regLog('Error iniciando'+ str(e.message) + ' Argumentos: ' + str(e.args))
+                    regLog('Error iniciando: Argumentos: ' + str(e.args))
+                    # Probamos otro puerto:
+                    nPuertoSerial = (nPuertoSerial + 1) % len(puertoSerial)
                     
         except Exception as e:
-            regLog('Error Scrip Estacion: '+ str(e.message) + ' Argumentos: ' + str(e.args))
+            # Si ocurre un error general en el codigo de la estacion, lo reportamos
+            regLog('Error Scrip Estacion: Argumentos: ' + str(e.args))
 
-        # esperamos para realizar la proxima solicitud
+        # Esperamos para realizar la proxima solicitud
         sleep(5)
 
 # iniciamos hilo captura tiempo GPS
@@ -251,17 +334,14 @@ te.start()
 
 ###################################### Codigo principal ##################################################
 try:
-    
-    regLog("Reiniciando EasyCap...")
-    GPIO.output(ena_easy,GPIO.LOW) # Des-activamos capturado
-    sleep(10)
-    GPIO.output(ena_easy,GPIO.HIGH) # Activamos capturador
+    if tipoCapturador[tipEstacion]:
+        regLog("Reiniciando EasyCap...")
+        GPIO.output(ena_easy,GPIO.LOW) # Des-activamos capturado
+        sleep(10)
+        GPIO.output(ena_easy,GPIO.HIGH) # Activamos capturador
 
     ###################################### Inicio y Configuraciones ##################################################
-    regLog("Inicio Script captura AllSky VLC")    
-    GPIO.output(ena_easy,GPIO.HIGH) # Activamos capturador
-
-    # Indicamos inicio programa (probamos leds)
+    ######################################  Indicamos inicio programa (probamos leds)
     GPIO.output(led_rojo,GPIO.HIGH)
     sleep(1)
     GPIO.output(led_amar,GPIO.HIGH)
@@ -275,74 +355,77 @@ try:
     GPIO.output(led_verd,GPIO.LOW)
     regLog("Leds Iniciados") 
     
-    # Conteo de capturas
+    ######################################  Conteo de capturas
     num = "1"
-    try: # exepcion no existencia archivo
+    try: # Exepcion no existencia archivo
         file = open(rutaCon, "r")   
         num  = file.read() 
     except:
-        file = open(rutaCon, "w+")   # se crea el archivo 
+        ensure_dir(rutaCon)
+        file = open(rutaCon, "w+")   # Se crea el archivo 
         file.write(num) 
         file.close() 
     cont = int(num)
     regLog("Conteo Cargado: " + str(num))
 
-
-    # verificamos conexion y funcionamiento
+    ######################################  Variables verificacion conexion y funcionamiento
     videoIn = 0
     maxVideo = 2
     esperar = True
-    reiniciarE = 0      # permite reiniciar el capturador EasyCap
-    reiniciarR = 0      # permite reiniciar la raspberry 
-
-    # cerramos VLC
-    os.system("sudo killall vlc")
-    regLog("VLC Cerrado e inicio prog principal")
+    numCapturasFallidas = 0   # Permite reiniciar el capturador EasyCap y raspberry 
 
     ###################################### Programa principal ##################################################
+    regLog(" -------------------- Inicio programa principal ------------------------ ")
+    ultimoMinutoImagen=0              # Se inicializa variable usada para captura cada minuto
+    tiempo = actualizarTiempo() # Se inicializa el tiempo del sistema
+
     while(1):   
         try:
             tiempo = actualizarTiempo()
             regLog("Tsistema: " + str(tiempo))
 
             # Capturamos imagenes cada x tiempo
-            if esperar: 
-                regLog("Esperando... " + str(tencap) + ' Segundos')
-                sleep(tencap)       # dormimos el resto de tiempo hasta timeEntreF
-            else: 
-                esperar = True      # activamos nuevamente la espera
+            #if esperar: 
+            #    regLog("Esperando... " + str(tencap) + ' Segundos')
+            #    sleep(tencap)       # dormimos el resto de tiempo hasta timeEntreF
+            #else: 
+            #    esperar = True      # activamos nuevamente la espera
             
+             # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
+            while ultimoMinutoImagen == tiempo[4]:
+                tiempo = actualizarTiempo()
+                sleep(1)
+
             # Empiezo nueva captura 
             GPIO.output(led_verd,GPIO.LOW)
 
             # Creamos sistema de archivos
-            ruta = '/media/pi/MUSEO2/fotosCieloAllSky/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
-            #ruta = '/home/pi/Desktop/fotosCieloAllSky/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
+            ruta =  rutaImg + 'A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
             ensure_dir(ruta)
 
             # Se carga el tiempo
             tiempoStr = str(tiempo[0]) + '-' + "%02d"%tiempo[1] + '-' + "%02d"%tiempo[2] + '-' + "%02d"%tiempo[3]+ '-' + "%02d"%tiempo[4]
-            regLog("nCaptura... " + ruta + " T: " + tiempoStr)
+            regLog("Capturando... " + ruta + " T: " + tiempoStr)
 
             # Capturamos la lista de archivos antes de capturar
             listaOld = os.listdir(ruta) # Dir is your directory path
             number_filesOld = len(listaOld) # Le sumamos 1 para garantizar que se guardaron almenos 2 archivos
             
-            # Iniciamos VLC
+            # Iniciamos Captura
             GPIO.output(led_amar,GPIO.HIGH)
             #regLog("Iniciando VLC... ")
             #os.system("vlc v4l2:///dev/video" + str(videoIn) + " :v4l2-standard= :live-caching=3000 --scene-path=" + str(ruta) + " --scene-prefix=" + tiempoStr + "-C" + str(cont) + "_ &")
             regLog("Capturando imagen... ")
-            os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 800x600 -p JPEG  -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
+            os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
             
             # Esperamos que capture un par de escenas
             #regLog("Capturando... " + str(tcap) + ' Segundos')
-            sleep(tcap)		#dormimos el resto de tiempo hasta timeEntreF
+            #sleep(tcap)		#dormimos el resto de tiempo hasta timeEntreF
 
             # Cerramos VLC
-            os.system("sudo killall vlc")
+            #os.system("sudo killall vlc")
             GPIO.output(led_amar,GPIO.LOW)
-            sleep(2) # Esperamos unos segundos que cierre
+            #sleep(2) # Esperamos unos segundos que cierre
             
             # reiniciamos indicadores
             GPIO.output(led_rojo,GPIO.LOW)
@@ -363,7 +446,7 @@ try:
                 statinfo = os.stat(ruta + "/" + i)
                 tamFile = statinfo.st_size
 
-                # Removemos los Vacios
+                # Removemos los Vacios (< detemrinados bytes)
                 if tamFile<10000:
                     os.system("sudo rm " + ruta + "/" + i)
 
@@ -371,37 +454,42 @@ try:
             lista = os.listdir(ruta) # dir is your directory path
             number_files = len(lista)
 
-            regLog("Archivos nuevos detectados... " + str(number_files - number_filesOld))
+            number_files = number_files - number_filesOld
+            regLog("Archivos nuevos detectados... " + str(number_files))
 
-            if number_files < (number_filesOld + 1):
+            if number_files < 0:
                 videoIn = (videoIn + 1) % maxVideo
                 regLog("Falla video, probando otro puerto: " + str(videoIn))
                 GPIO.output(led_rojo,GPIO.HIGH)
                 cont = cont - 1     # Reiniciamos la captura anterior
-                esperar = False     # Intentamos capturar de inmediato
-                reiniciarE = reiniciarE + 1
 
+                # Contador intentos fallidos de captura 
+                numCapturasFallidas = numCapturasFallidas + 1
 
-                if reiniciarE > 3:
+                if numCapturasFallidas > 3:
+                    # Falla en captura leve
                     GPIO.output(led_rojo,GPIO.HIGH)
-                    regLog("Reiniciando EasyCap...")
-                    GPIO.output(ena_easy,GPIO.LOW) # Des-activamos capturador
-                    sleep(10)
-                    GPIO.output(ena_easy,GPIO.HIGH) # Activamos capturador
-                    #os.system("sudo reboot")
-                    reiniciarE = 0
+                    if tipoCapturador[tipEstacion]:
+                        regLog("Reiniciando EasyCap...")
+                        GPIO.output(ena_easy,GPIO.LOW) # Des-activamos capturador
+                        sleep(10)
+                        GPIO.output(ena_easy,GPIO.HIGH) # Activamos capturador
 
-                    
+                # Se evita perder datos de la estacion preguntanto si ya fue capturado el ultimo minuto
+                if numCapturasFallidas > 10 and False:
+                    # Falla en captura permanente, reinicio Raspberry
+                    os.system("sudo reboot")
+
+                # Verificamos estado imagen 
 
             else: # Imagenes generadas correctamente?
                 GPIO.output(led_verd,GPIO.HIGH)
-                reiniciarE = 0
+                numCapturasFallidas = 0
+                ultimoMinutoImagen = tiempo[4]
 
-            # Cerramos VLC
-            print ("cerrando VLC... ")
-            os.system("sudo killall vlc")
+
         except Exception as e:
-            regLog('Error Scrip Captura: '+ str(e.message) + ' Argumentos: ' + str(e.args))
+            regLog('Error Scrip Captura: Argumentos: ' + str(e.args))
 
 
 ###################################### Fin codigo
