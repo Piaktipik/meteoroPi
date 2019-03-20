@@ -1,0 +1,60 @@
+links:
+
+http://www.instructables.com/id/Raspberry-Pi-Launch-Python-script-on-startup/?ALLSTEPS
+
+
+creamos un archivo llamado launcher.sh:
+
+sudo nano launcher.sh
+
+ponemos en el las siguientes lineas
+
+#!/bin/sh
+# launcher.sh
+# navigate to home directory, then to this directory, then execute pyth$
+
+cd /
+cd home/pi/nombreCarpeta
+sudo python nombreApp.py
+cd /
+
+en nuestro caso esta seccion queda asi:
+
+cd /
+cd home/pi/codigo-arranque
+sudo python interface.py
+cd /
+
+guardamos.
+
+hacemos este archivo ejecutable:
+
+chmod 755 launcher.sh
+
+probamos que funcione:
+
+sh launcher.sh
+
+creamos un archivo para guardar los logs:
+
+mkdir logs
+
+añadimos el archivo launcher.sh al tablero cronologico, para que lo ejecute al arranque:
+
+tecleamos:
+sudo crontab -e
+
+lo editamos con nano y agregamos al final la sigueinte linea:
+
+@reboot sh /home/pi/codigo-arranque/launcher.sh >/home/pi/codigo-arranque/logs/cronlog 2>&1
+
+con esta linea indicamos que arraque al inicio y 
+guarde todos los logs generados en al carpeta /home/pi/codigo-arranque/logs que creamos anteriormente
+
+guardamos y reiniciamos para verificar el inicio al arranque.
+
+sudo reboot
+ 
+
+
+
