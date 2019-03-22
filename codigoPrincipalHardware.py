@@ -38,12 +38,12 @@ arcLogCapturaDavis = "logDavis"
 
 ###################################### Parametros Rutas:
 rutaMeteoroPi = "/home/pi/meteoroPi/"
-rutaImagenes = "/media/pi/FOTOS/"
+rutaImagenes = "/media/pi/4D59-20AF/"
 
 carpetaConfigurciones = "config/"
 carpetaLogs = "logs/"
 carpetaDatos = "datos/"
-carpetaImagenes = "fotosCamara/"
+carpetaImagenes = "fotosCieloAllSky/"
 
 # Se definen las rutas de los archivos de configuracion
 rutaCon = rutaMeteoroPi + carpetaConfigurciones + arcConteo + ".txt"
@@ -211,12 +211,12 @@ def capturaEstacion():
                 regLog('Solicitando LOOP: ')
                 ser.write(b'\n')
                 ser.write(b'\n')
+                sleep(0.1)
                 ser.write(b'LOOP 1') 
-                ser.flush()
-
+                sleep(0.1)
                 # Leemos la trama LOOP 
                 x = ser.read(100)          # read 99 bytes
-                # Reportamos los datos leidos
+                ser.flush()
                 regLog('Lectura: ')
                 regLog(x)
 
@@ -415,8 +415,14 @@ try:
             GPIO.output(led_amar,GPIO.HIGH)
             #regLog("Iniciando VLC... ")
             #os.system("vlc v4l2:///dev/video" + str(videoIn) + " :v4l2-standard= :live-caching=3000 --scene-path=" + str(ruta) + " --scene-prefix=" + tiempoStr + "-C" + str(cont) + "_ &")
-            regLog("Capturando imagen... ")
-            os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
+            if tipoCapturador[tipEstacion]:
+                regLog("Capturando imagen EasyCap... ")
+                os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -S 40 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
+            else:
+                regLog("Capturando imagen... ")
+                os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
+            
+            
             
             # Esperamos que capture un par de escenas
             #regLog("Capturando... " + str(tcap) + ' Segundos')
@@ -447,7 +453,7 @@ try:
                 tamFile = statinfo.st_size
 
                 # Removemos los Vacios (< detemrinados bytes)
-                if tamFile<10000:
+                if tamFile<50000:
                     os.system("sudo rm " + ruta + "/" + i)
 
             # Cargamos de nuevo la lista de archivos creados aparentemente (tamano) validos
@@ -457,7 +463,7 @@ try:
             number_files = number_files - number_filesOld
             regLog("Archivos nuevos detectados... " + str(number_files))
 
-            if number_files < 0:
+            if number_files < 1:
                 videoIn = (videoIn + 1) % maxVideo
                 regLog("Falla video, probando otro puerto: " + str(videoIn))
                 GPIO.output(led_rojo,GPIO.HIGH)
