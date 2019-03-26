@@ -112,7 +112,7 @@ GPIO.setup(led_amar, GPIO.OUT)
 GPIO.setup(led_verd, GPIO.OUT)
 GPIO.setup(ena_easy, GPIO.OUT)
 
-# Identificamos el puerto USB estacion Davis 
+# Identificamos el puerto USB estacion Davis
 if tipoDavis[tipEstacion]:
     puertoSerial = ['/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3']    # Davis Real
 else:
@@ -188,6 +188,7 @@ def capturaEstacion():
     ultimoMinuto=0              # Se inicializa variable usada para captura cada minuto
     tiempo = actualizarTiempo() # Se inicializa el tiempo del sistema
     
+    nPuertoSerial = 0
     while(1):
 
         # Intentamos correr el codigo de captura de datos de la estacion Davis
@@ -199,7 +200,6 @@ def capturaEstacion():
                 sleep(1)
 
             # Pasado un minuto procedemos a solicitar un dato de la estacion
-            nPuertoSerial = 0
             if serialOperativo:
                 # Si la comunicacion serial esta activa ->
 
@@ -308,9 +308,10 @@ def capturaEstacion():
                 except Exception as e:
                     # Si ocurre un error iniciando el puerto serial, lo reportamos
                     serialOperativo = False
-                    regLog('Error iniciando: Argumentos: ' + str(e.args))
                     # Probamos otro puerto:
                     nPuertoSerial = (nPuertoSerial + 1) % len(puertoSerial)
+                    regLog('Error iniciando: Argumentos: ' + str(e.args) + 'Probando puerto: '+ str(puertoSerial[nPuertoSerial]))
+                    
                     
         except Exception as e:
             # Si ocurre un error general en el codigo de la estacion, lo reportamos
@@ -454,7 +455,7 @@ try:
 
                 # Removemos los Vacios o defectuosos(< detemrinados bytes)
                 if tipoCapturador[tipEstacion]:
-                    if tamFile<180000:
+                    if tamFile<50000:
                         os.system("sudo rm " + ruta + "/" + i)
                 else:
                     if tamFile<50000:
