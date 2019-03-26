@@ -452,9 +452,13 @@ try:
                 statinfo = os.stat(ruta + "/" + i)
                 tamFile = statinfo.st_size
 
-                # Removemos los Vacios (< detemrinados bytes)
-                if tamFile<50000:
-                    os.system("sudo rm " + ruta + "/" + i)
+                # Removemos los Vacios o defectuosos(< detemrinados bytes)
+                if tipoCapturador[tipEstacion]:
+                    if tamFile<180000:
+                        os.system("sudo rm " + ruta + "/" + i)
+                else:
+                    if tamFile<50000:
+                        os.system("sudo rm " + ruta + "/" + i)
 
             # Cargamos de nuevo la lista de archivos creados aparentemente (tamano) validos
             lista = os.listdir(ruta) # dir is your directory path
