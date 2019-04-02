@@ -8,6 +8,7 @@ import gps as gp
 import threading
 import serial
 import csv
+import pwd
 
 ###################################### Parametros ##################################################
 ###################################### Parametros Estacion:
@@ -38,7 +39,7 @@ arcLogCapturaDavis = "logDavis"
 
 ###################################### Parametros Rutas:
 rutaMeteoroPi = "/home/pi/meteoroPi/"
-rutaImagenes = "/media/pi/4D59-20AF/"
+rutaImagenes = "/media/pi/4D59-20AF"
 
 carpetaConfigurciones = "config/"
 carpetaLogs = "logs/"
@@ -53,19 +54,45 @@ rutaLog = rutaMeteoroPi + carpetaLogs + arcLogCapturaImagen + ".txt"
 rutaLogD = rutaMeteoroPi + carpetaLogs + arcLogCapturaDavis + ".txt"
 # Se definen las rutas donde se guardan los datos
 rutaDatos = rutaMeteoroPi + carpetaDatos 
-rutaImg = rutaImagenes + carpetaImagenes
+rutaImg = rutaImagenes + "/" + carpetaImagenes
 
 # Verificacion rutas guardado archivos
 def ensure_dir(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
         os.makedirs(d)
+        uid =  pwd.getpwnam('pi').pw_uid
+        os.chown(d, uid, uid) # set user and group
+        
+def ensure_USB(rUSB,f):
+    pUSB = os.path.dirname(rUSB)
+    d = os.path.dirname(f)
+    if os.path.exists(pUSB):
+        # USB conectada
+        if not os.path.exists(d):
+            # USB no conectada
+            os.makedirs(d)
+            uid =  pwd.getpwnam('pi').pw_uid
+            os.chown(d, uid, uid) # set user and group
+            #uid, gid =  pwd.getpwnam('pi').pw_uid, pwd.getpwnam('pi').pw_uid
+            #os.chown(d, uid, gid) # set user:group as root:pi
+    else:
+        #Si usb no conectada
+        regLog("USB: " + str(rUSB) + " no detectada")
+        # Estrategia de almacenamiento alterna - reiniciar?
 
 # Registro actividad en .txt y consola
 def regLog(texto):
     print (texto)
     ensure_dir(rutaLog)
     fileL = open(rutaLog, "a")   # se crea el archivo 
+    fileL.write(texto + '\n') 
+    fileL.close()
+    
+def regLogD(texto):
+    print (texto)
+    ensure_dir(rutaLogD)
+    fileL = open(rutaLogD, "a")   # se crea el archivo 
     fileL.write(texto + '\n') 
     fileL.close() 
 
@@ -217,8 +244,8 @@ def capturaEstacion():
                 # Leemos la trama LOOP 
                 x = ser.read(100)          # read 99 bytes
                 ser.flush()
-                regLog('Lectura: ')
-                regLog(x)
+                regLogD('Lectura: ')
+                regLogD(x)
 
                 # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
                 ruta = rutaDatos + 'davis/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
@@ -402,7 +429,7 @@ try:
 
             # Creamos sistema de archivos
             ruta =  rutaImg + 'A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
-            ensure_dir(ruta)
+            ensure_USB(rutaImagenes,ruta)
 
             # Se carga el tiempo
             tiempoStr = str(tiempo[0]) + '-' + "%02d"%tiempo[1] + '-' + "%02d"%tiempo[2] + '-' + "%02d"%tiempo[3]+ '-' + "%02d"%tiempo[4]
