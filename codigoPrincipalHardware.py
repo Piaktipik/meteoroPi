@@ -41,7 +41,7 @@ arcLogCapturaDavis = "logDavis"
 
 ###################################### Parametros Rutas:
 rutaMeteoroPi = "/home/pi/meteoroPi/"
-rutaImagenes = "/media/pi/FOTOS"
+rutaImagenes = "/media/pi/4D59-20AF"
 
 carpetaConfigurciones = "config/"
 carpetaLogs = "logs/"
@@ -516,7 +516,7 @@ try:
 
                 # Removemos los Vacios o defectuosos(< detemrinados bytes)
                 if tipoCapturador[tipEstacion]:
-                    if tamFile<50000:
+                    if tamFile<180000:
                         os.system("sudo rm " + ruta + "/" + i)
                 else:
                     if tamFile<50000:
