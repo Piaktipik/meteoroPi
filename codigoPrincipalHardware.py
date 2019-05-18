@@ -41,7 +41,7 @@ arcLogCapturaDavis = "logDavis"
 
 ###################################### Parametros Rutas:
 rutaMeteoroPi = "/home/pi/meteoroPi/"
-rutaImagenes = "/media/pi/4D59-20AF"
+rutaImagenes = "/media/pi/FOTOS"
 
 carpetaConfigurciones = "config/"
 carpetaLogs = "logs/"
@@ -65,6 +65,7 @@ def ensure_dir(f):
         os.makedirs(d)
         uid =  pwd.getpwnam('pi').pw_uid
         os.chown(d, uid, uid) # set user and group
+        os.system("sudo chmod 777 " + str(d))
         
 def ensure_USB(rUSB,f):
     pUSB = os.path.dirname(rUSB)
@@ -76,6 +77,7 @@ def ensure_USB(rUSB,f):
             os.makedirs(d)
             uid =  pwd.getpwnam('pi').pw_uid
             os.chown(d, uid, uid) # set user and group
+            os.system("sudo chmod 777 " + str(d))
             #uid, gid =  pwd.getpwnam('pi').pw_uid, pwd.getpwnam('pi').pw_uid
             #os.chown(d, uid, gid) # set user:group as root:pi
     else:
@@ -147,6 +149,7 @@ if tipoDavis[tipEstacion]:
 else:
     puertoSerial = ['/dev/ttyACM0','/dev/ttyACM1','/dev/ttyACM2','/dev/ttyACM3']    # Pruebas arduino
 
+
 ###################################### Funciones ##################################################
 # Mezcla bytes de la trama entregada por la estacion Davis
 def mix2bytes(datosE,pos):
@@ -211,6 +214,7 @@ def worker():
 
 # Hilo Captura datos Estacion
 def capturaEstacion():
+    regLog('Codigo captura estacion iniciado...')
     ###################################### Guardamos Datos Estacion
     serialOperativo = False     # Se entiende como inactiva la conexion con la estacion Davis
     ser = None                  # Limpiamos conexion comunicacion serial Davis
@@ -219,7 +223,7 @@ def capturaEstacion():
     
     nPuertoSerial = 0
     while(1):
-
+        regLog('*')
         # Intentamos correr el codigo de captura de datos de la estacion Davis
         try:
             
@@ -232,26 +236,38 @@ def capturaEstacion():
             if serialOperativo:
                 # Si la comunicacion serial esta activa ->
 
-                # Vaciamos buffer puerto Serial
-                while (ser.in_waiting > 0):
-                    ser.read()
-
                 ###################################### Solicitamos una trama LOOP a la estacion:
-                regLog('Solicitando LOOP: ')
-                ser.write(b'\n')
-                ser.write(b'\n')
-                sleep(0.1)
-                ser.write(b'LOOP 1') 
-                sleep(0.1)
-                # Leemos la trama LOOP 
-                x = ser.read(100)          # read 99 bytes
-                ser.flush()
-                regLogD('Lectura: ')
-                regLogD(x)
+                if tipoArduino[tipEstacion]:
+                    regLog('Leyendo Arduino: ')
+                    x = ser.readline()          # read line
+                    #ser.flush()
+                    regLogD('Lectura: ')
+                    regLogD(x)
+                    
+                    # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
+                    ruta = rutaDatos + 'arduino/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
+                    ensure_dir(ruta)
+                
+                else:
+                    # Vaciamos buffer puerto Serial
+                    while (ser.in_waiting > 0):
+                        ser.read()
+                    
+                    regLog('Solicitando LOOP: ')
+                    ser.write(b'\n')
+                    ser.write(b'\n')
+                    sleep(0.1)
+                    ser.write(b'LOOP 1') 
+                    sleep(0.1)
+                    # Leemos la trama LOOP 
+                    x = ser.read(100)          # read 99 bytes
+                    ser.flush()
+                    regLogD('Lectura: ')
+                    regLogD(x)
 
-                # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
-                ruta = rutaDatos + 'davis/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
-                ensure_dir(ruta)
+                    # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
+                    ruta = rutaDatos + 'davis/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
+                    ensure_dir(ruta)
 
                 ###################################### Se carga el tiempo 
                 # En el nombre del archivo  en formato pandas YY-MM-DD HH:MM:SS
@@ -261,31 +277,41 @@ def capturaEstacion():
                 # Se reporta tiempo captura
                 regLog("nCaptura... " + ruta + " T: " + tiempoStr + " Procesando trama...")
 
-                ###################################### Procesamos los datos Capturados
                 Datos = [tiempoStr]     # Cargamos el tiempo como primera columna
-                # Se verifica que el tamano sea valido
-                if len(x) > 99:
-                    if(x[1]!='L'):      # Se verifica que el paquete inicie con L (de la trama LOOP)
-                        continue        # Si no es correcto se solicita un nuevo paquete
-                    
-                    ###################################### Recorremos, y alistamos datos para almacenamiento
-                    for i in range(TamD):
-                        aux = '0'
-                        #regLog(Nombres[i] + ' Save:' +  str(DSave[i]) + ' * [' + str(DFact[i])+ ']')
-                        if i<4:
-                            aux = x[i] 
-                        elif Dsize[i] < 2:
-                            aux = str(ord(x[Doff[i]]))
-                        else:
-                            aux = str(mix2bytes(x,Doff[i]))
-                        #regLog(aux)
-                        # Agregamos Datos a salida
-                        if DSave[i] == 1:
-                            Datos.append(aux)
+                
+                ###################################### Procesamos los datos Capturados
+                if tipoArduino[tipEstacion]:
+                    # Se verifica que el tamano sea valido
+                    if len(x) > 2:
+                        if(x[0] != 'T'):    # Se verifica que el paquete inicie con T (de la trama Arduino)
+                            continue        # Si no es correcto se solicita un nuevo paquete
+                        Datos.append(x)
                 else:
-                    # Si no es correcto se solicita un nuevo paquete
-                    regLog('# Datos < 100, Captura Incompleta... Reintentando')
-                    continue
+                    # Se verifica que el tamano sea valido
+                    if len(x) > 99:
+                        if(x[1]!='L'):      # Se verifica que el paquete inicie con L (de la trama LOOP)
+                            continue        # Si no es correcto se solicita un nuevo paquete
+                        
+                        ###################################### Recorremos, y alistamos datos para almacenamiento
+                        for i in range(TamD):
+                            aux = '0'
+                            #regLog(Nombres[i] + ' Save:' +  str(DSave[i]) + ' * [' + str(DFact[i])+ ']')
+                            if i<4:
+                                aux = x[i] 
+                            elif Dsize[i] < 2:
+                                aux = str(ord(x[Doff[i]]))
+                            else:
+                                aux = str(mix2bytes(x,Doff[i]))
+                            #regLog(aux)
+                            # Agregamos Datos a salida
+                            if DSave[i] == 1:
+                                Datos.append(aux)
+                    else:
+                        # Si no es correcto se solicita un nuevo paquete
+                        regLog('# Datos < 100, Captura Incompleta... Reintentando')
+                        continue
+                
+                
                 
                 # Si los datos tienen el inicio y cantidad correcta los guardamos
                 ###################################### Guardamos los datos Capturados
@@ -298,16 +324,19 @@ def capturaEstacion():
                     # Archivo no existe, lo creamos
                     print('Error apertura... Creando archivo')
                     writer = csv.writer(open(fileName, 'w'))
+                    
+                    if tipoArduino[tipEstacion]:
+                        pass
+                    else:
+                        # Cargamos nombres headers
+                        headers = ['Tiempo Sistema'] # Cargamos el tiempo como primera columna
+                        for i in range(TamD):
+                            if DSave[i] == 1:
+                                headers.append(Nombres[i])
+                        #regLog('Cabecera a escribir: ' + str(headers))
 
-                    # Cargamos nombres headers
-                    headers = ['Tiempo Sistema'] # Cargamos el tiempo como primera columna
-                    for i in range(TamD):
-                        if DSave[i] == 1:
-                            headers.append(Nombres[i])
-                    #regLog('Cabecera a escribir: ' + str(headers))
-
-                    # Cargamos cabecera del .CSV
-                    writer.writerow(headers)
+                        # Cargamos cabecera del .CSV
+                        writer.writerow(headers)
 
                 # Abrimos el archivo
                 writer = csv.writer(open(fileName, 'a'))
@@ -315,7 +344,7 @@ def capturaEstacion():
                 writer.writerow(Datos)
                 regLog('Datos Guardados')
 
-                # Todo salido bien!, indicamos que ya se guardo datos para este minuto
+                # Todo ha salido bien!, indicamos que ya se guardo datos para este minuto
                 ultimoMinuto = tiempo[4]
                 
             # Si no hay conexion serial:
@@ -328,7 +357,10 @@ def capturaEstacion():
                         os.system(''' pgrep gpsd | awk '{system("sudo kill "$1)}' ''')
                     
                     # Se crea el puerto
-                    ser = serial.Serial(puertoSerial[nPuertoSerial], 19200, timeout=5)
+                    if tipoArduino[tipEstacion]:
+                        ser = serial.Serial(puertoSerial[nPuertoSerial], 9600, timeout=5)
+                    else:
+                        ser = serial.Serial(puertoSerial[nPuertoSerial], 19200, timeout=5)
                     # Se reporta el puerto iniciado
                     regLog(ser.name)
                     serialOperativo = True
