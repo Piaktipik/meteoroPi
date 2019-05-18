@@ -13,14 +13,16 @@ import pwd
 ###################################### Parametros ##################################################
 ###################################### Parametros Estacion:
 tipEstacion = 0 # Tipo de estacion (Por defecto pruebas)
-# Tipo  :Capturador :GPS    :Davis      : Caso
-# 0     :no         :no     :simulada   : Pruebas Julian
-# 1     :no         :no     :real       : ITM
-# 2     :easycap    :si     :real       : UdeA Oriente
+# Tipo  :Capturador :GPS    :Davis      :Arduino    : Caso
+# 0     :no         :no     :simulada   : no        : Pruebas Julian
+# 1     :no         :no     :real       : no        : ITM
+# 2     :easycap    :si     :real       : no        : UdeA Oriente
+# 3     :no         :no     :simulada   : si        : Arduino Dugler
 
-tipoCapturador = [False,False,True] 
-tipoGPS        = [False,False,True]
-tipoDavis      = [False,True,True]
+tipoCapturador = [False,False,True,False] 
+tipoGPS        = [False,False,True,False]
+tipoDavis      = [False,True,True,False]
+tipoArduino    = [False,False,False,True]
 
 # Notas: GPS instalado en puerto serial GPIO raspberry
 
