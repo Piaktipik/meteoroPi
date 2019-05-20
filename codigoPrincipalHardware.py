@@ -60,45 +60,72 @@ rutaImg = rutaImagenes + "/" + carpetaImagenes
 
 # Verificacion rutas guardado archivos
 def ensure_dir(f):
-    d = os.path.dirname(f)
-    if not os.path.exists(d):
-        os.makedirs(d)
-        uid =  pwd.getpwnam('pi').pw_uid
-        os.chown(d, uid, uid) # set user and group
-        os.system("sudo chmod 777 " + str(d))
-        
-def ensure_USB(rUSB,f):
-    pUSB = os.path.dirname(rUSB)
-    d = os.path.dirname(f)
-    if os.path.exists(pUSB):
-        # USB conectada
+    try:
+        d = os.path.dirname(f)
         if not os.path.exists(d):
-            # USB no conectada
+            regLog("Creando Ruta: " + f + " ... " )
             os.makedirs(d)
             uid =  pwd.getpwnam('pi').pw_uid
             os.chown(d, uid, uid) # set user and group
             os.system("sudo chmod 777 " + str(d))
-            #uid, gid =  pwd.getpwnam('pi').pw_uid, pwd.getpwnam('pi').pw_uid
-            #os.chown(d, uid, gid) # set user:group as root:pi
-    else:
-        #Si usb no conectada
-        regLog("USB: " + str(rUSB) + " no detectada")
-        # Estrategia de almacenamiento alterna - reiniciar?
+            regLog("Ruta: " + f + " Creada" )
+            
+    except Exception as e:
+        # Error log
+        regLog('Error ensure_dir: ' + str(e))
+        
+def ensure_USB(rUSB,f):
+    regLog("Creando Ruta: " + f + " ... " )
+    try:
+        pUSB = os.path.dirname(rUSB)
+        d = os.path.dirname(f)
+        if os.path.exists(pUSB):
+            # USB conectada
+            if not os.path.exists(d):
+                # USB no conectada
+                os.makedirs(d)
+                uid =  pwd.getpwnam('pi').pw_uid
+                os.chown(d, uid, uid) # set user and group
+                os.system("sudo chmod 777 " + str(d))
+                regLog("Ruta: " + f + " Creada" )
+                #uid, gid =  pwd.getpwnam('pi').pw_uid, pwd.getpwnam('pi').pw_uid
+                #os.chown(d, uid, gid) # set user:group as root:pi
+        else:
+            #Si usb no conectada
+            regLog("USB: " + str(rUSB) + " no detectada")
+            # Posible procedimiento reconexion USB
+            #sudo mkdir /media/pi/4D59-20AF
+            #sudo umount /dev/sda1
+            #sudo mount -t vfat /dev/sda1 /media/pi/4D59-20AF/ -o uid=1000
+            
+            # Estrategia de almacenamiento alterna - reiniciar?
+    except Exception as e:
+        # Error log
+        regLog('Error ensure_USB: ' + str(e))
 
 # Registro actividad en .txt y consola
 def regLog(texto):
-    print (texto)
-    ensure_dir(rutaLog)
-    fileL = open(rutaLog, "a")   # se crea el archivo 
-    fileL.write(texto + '\n') 
-    fileL.close()
+    try:
+        print (texto)
+        ensure_dir(rutaLog)
+        fileL = open(rutaLog, "a")   # se crea el archivo 
+        fileL.write(texto + '\n') 
+        fileL.close()
+    except Exception as e:
+        # Error log
+        print('Error regLog: ' + str(e))
+        
     
 def regLogD(texto):
-    print (texto)
-    ensure_dir(rutaLogD)
-    fileL = open(rutaLogD, "a")   # se crea el archivo 
-    fileL.write(texto + '\n') 
-    fileL.close() 
+    try:
+        print (texto)
+        ensure_dir(rutaLogD)
+        fileL = open(rutaLogD, "a")   # se crea el archivo 
+        fileL.write(texto + '\n') 
+        fileL.close()
+    except Exception as e:
+        # Error log
+        print('Error regLogD: ' + str(e))
 
 ###################################### Verificacion de tipo de estacion
 try: # exepcion no existencia archivo
@@ -109,7 +136,8 @@ except:
     ensure_dir(rutaEst)
     file = open(rutaEst, "w+")   # Se crea el archivo 
     file.write(str(tipEstacion)) 
-    file.close() 
+    file.close()
+    
 regLog("Tipo Estacion Cargado: " + str(tipEstacion))
 
 
@@ -377,6 +405,7 @@ def capturaEstacion():
         except Exception as e:
             # Si ocurre un error general en el codigo de la estacion, lo reportamos
             regLog('Error Scrip Estacion: Argumentos: ' + str(e.args))
+            sleep(1)
 
         # Esperamos para realizar la proxima solicitud
         sleep(5)
@@ -562,6 +591,7 @@ try:
 
         except Exception as e:
             regLog('Error Scrip Captura: Argumentos: ' + str(e.args))
+            sleep(1)
 
 
 ###################################### Fin codigo
