@@ -2,6 +2,8 @@
 # launcher.sh
 # navigate to home directory, then to this directory, then execute python script, then back h
 
+sudo cp arranque/rc.local /etc/
+
 #set nLaun1=launcher.sh
 #set nLaun2=launcherWeb.sh
 
