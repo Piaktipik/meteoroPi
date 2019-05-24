@@ -27,9 +27,6 @@ Name | Description
 `station-code/`| Python3 Code.
 `station-code/collectweather.py`| Main code for collecting weather data.
 `README.md`|This file
-`LICENSE`|Apache 2.0 License
-`frontend/`| Docker container from running PHP scripts to display the data.
-`structure.sql` | Postgresql Data schema.
 
 
 
