@@ -79,7 +79,7 @@ def ensure_USB(rUSB,f):
     try:
         pUSB = os.path.dirname(rUSB)
         d = os.path.dirname(f)
-        if os.path.exists(pUSB):
+        if os.path.exists(rUSB):
             # USB conectada
             if not os.path.exists(d):
                 # USB no conectada
@@ -90,18 +90,34 @@ def ensure_USB(rUSB,f):
                 regLog("Ruta: " + f + " Creada" )
                 #uid, gid =  pwd.getpwnam('pi').pw_uid, pwd.getpwnam('pi').pw_uid
                 #os.chown(d, uid, gid) # set user:group as root:pi
+            return True
         else:
             #Si usb no conectada
             regLog("USB: " + str(rUSB) + " no detectada")
             # Posible procedimiento reconexion USB
+            #sudo rm -r /media/pi/4D59-20AF
             #sudo mkdir /media/pi/4D59-20AF
             #sudo umount /dev/sda1
             #sudo mount -t vfat /dev/sda1 /media/pi/4D59-20AF/ -o uid=1000
+            #sudo mount -t vfat /dev/sdb1 /media/pi/4D59-20AF/ -o uid=1000
             
             # Estrategia de almacenamiento alterna - reiniciar?
     except Exception as e:
         # Error log
         regLog('Error ensure_USB: ' + str(e))
+    return False
+
+def moverAUSB():
+    regLog("Moviendo archivos: " + f + " ... " )
+    try:
+        # si esta conectada la USB intentamos mover los arhivos a esta
+        os.system("sudo mv -r /home/pi/Desktop/" + carpetaImagenes + " " + rutaImg)
+    except Exception as e:
+        # Error log
+        regLog('Error moverAUSB: ' + str(e))
+    
+
+########################################### Logs
 
 # Registro actividad en .txt y consola
 def regLog(texto):
@@ -492,101 +508,105 @@ try:
 
             # Creamos sistema de archivos
             ruta =  rutaImg + 'A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
-            ensure_USB(rutaImagenes,ruta)
-
-            # Se carga el tiempo
-            tiempoStr = str(tiempo[0]) + '-' + "%02d"%tiempo[1] + '-' + "%02d"%tiempo[2] + '-' + "%02d"%tiempo[3]+ '-' + "%02d"%tiempo[4]
-            regLog("Capturando... " + ruta + " T: " + tiempoStr)
-
-            # Capturamos la lista de archivos antes de capturar
-            listaOld = os.listdir(ruta) # Dir is your directory path
-            number_filesOld = len(listaOld) # Le sumamos 1 para garantizar que se guardaron almenos 2 archivos
+            resultadoUSB = ensure_USB(rutaImagenes,ruta)
             
-            # Iniciamos Captura
-            GPIO.output(led_amar,GPIO.HIGH)
-            #regLog("Iniciando VLC... ")
-            #os.system("vlc v4l2:///dev/video" + str(videoIn) + " :v4l2-standard= :live-caching=3000 --scene-path=" + str(ruta) + " --scene-prefix=" + tiempoStr + "-C" + str(cont) + "_ &")
-            if tipoCapturador[tipEstacion]:
-                regLog("Capturando imagen EasyCap... ")
-                os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -S 40 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
-            else:
-                regLog("Capturando imagen... ")
-                os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
-            
-            
-            
-            # Esperamos que capture un par de escenas
-            #regLog("Capturando... " + str(tcap) + ' Segundos')
-            #sleep(tcap)		#dormimos el resto de tiempo hasta timeEntreF
+            if resultadoUSB :
+                # Se carga el tiempo
+                tiempoStr = str(tiempo[0]) + '-' + "%02d"%tiempo[1] + '-' + "%02d"%tiempo[2] + '-' + "%02d"%tiempo[3]+ '-' + "%02d"%tiempo[4]
+                regLog("Capturando... " + ruta + " T: " + tiempoStr)
 
-            # Cerramos VLC
-            #os.system("sudo killall vlc")
-            GPIO.output(led_amar,GPIO.LOW)
-            #sleep(2) # Esperamos unos segundos que cierre
-            
-            # reiniciamos indicadores
-            GPIO.output(led_rojo,GPIO.LOW)
-
-            # Actualizamos el contador de captura
-            cont = cont + 1
-            file = open(rutaCon,"w") 
-            file.write(str(cont)) 
-            file.close() 
-
-            ## verificamos que este guardando si no cambiamos puerto de video y reintentamos de inmediato
-            # tomamos la primera lista de archivos creados para remover los vacios!
-            lista = os.listdir(ruta) # dir is your directory path
-            number_files = len(lista)
-
-            # verificamos tamano archivos generados, removemos los vacios
-            for i in lista:
-                statinfo = os.stat(ruta + "/" + i)
-                tamFile = statinfo.st_size
-
-                # Removemos los Vacios o defectuosos(< detemrinados bytes)
+                # Capturamos la lista de archivos antes de capturar
+                listaOld = os.listdir(ruta) # Dir is your directory path
+                number_filesOld = len(listaOld) # Le sumamos 1 para garantizar que se guardaron almenos 2 archivos
+                
+                # Iniciamos Captura
+                GPIO.output(led_amar,GPIO.HIGH)
+                #regLog("Iniciando VLC... ")
+                #os.system("vlc v4l2:///dev/video" + str(videoIn) + " :v4l2-standard= :live-caching=3000 --scene-path=" + str(ruta) + " --scene-prefix=" + tiempoStr + "-C" + str(cont) + "_ &")
                 if tipoCapturador[tipEstacion]:
-                    if tamFile<180000:
-                        os.system("sudo rm " + ruta + "/" + i)
+                    regLog("Capturando imagen EasyCap... ")
+                    os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -S 40 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
                 else:
-                    if tamFile<50000:
-                        os.system("sudo rm " + ruta + "/" + i)
+                    regLog("Capturando imagen... ")
+                    os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
+                
+                
+            
+                # Esperamos que capture un par de escenas
+                #regLog("Capturando... " + str(tcap) + ' Segundos')
+                #sleep(tcap)		#dormimos el resto de tiempo hasta timeEntreF
 
-            # Cargamos de nuevo la lista de archivos creados aparentemente (tamano) validos
-            lista = os.listdir(ruta) # dir is your directory path
-            number_files = len(lista)
+                # Cerramos VLC
+                #os.system("sudo killall vlc")
+                GPIO.output(led_amar,GPIO.LOW)
+                #sleep(2) # Esperamos unos segundos que cierre
+                
+                # reiniciamos indicadores
+                GPIO.output(led_rojo,GPIO.LOW)
 
-            number_files = number_files - number_filesOld
-            regLog("Archivos nuevos detectados... " + str(number_files))
+                # Actualizamos el contador de captura
+                cont = cont + 1
+                file = open(rutaCon,"w") 
+                file.write(str(cont)) 
+                file.close() 
 
-            if number_files < 1:
-                videoIn = (videoIn + 1) % maxVideo
-                regLog("Falla video, probando otro puerto: " + str(videoIn))
-                GPIO.output(led_rojo,GPIO.HIGH)
-                cont = cont - 1     # Reiniciamos la captura anterior
+                ## verificamos que este guardando si no cambiamos puerto de video y reintentamos de inmediato
+                # tomamos la primera lista de archivos creados para remover los vacios!
+                lista = os.listdir(ruta) # dir is your directory path
+                number_files = len(lista)
 
-                # Contador intentos fallidos de captura 
-                numCapturasFallidas = numCapturasFallidas + 1
+                # verificamos tamano archivos generados, removemos los vacios
+                for i in lista:
+                    statinfo = os.stat(ruta + "/" + i)
+                    tamFile = statinfo.st_size
 
-                if numCapturasFallidas > 3:
-                    # Falla en captura leve
-                    GPIO.output(led_rojo,GPIO.HIGH)
+                    # Removemos los Vacios o defectuosos(< detemrinados bytes)
                     if tipoCapturador[tipEstacion]:
-                        regLog("Reiniciando EasyCap...")
-                        GPIO.output(ena_easy,GPIO.LOW) # Des-activamos capturador
-                        sleep(10)
-                        GPIO.output(ena_easy,GPIO.HIGH) # Activamos capturador
+                        if tamFile<180000:
+                            os.system("sudo rm " + ruta + "/" + i)
+                    else:
+                        if tamFile<50000:
+                            os.system("sudo rm " + ruta + "/" + i)
 
-                # Se evita perder datos de la estacion preguntanto si ya fue capturado el ultimo minuto
-                if numCapturasFallidas > 10 and False:
-                    # Falla en captura permanente, reinicio Raspberry
-                    os.system("sudo reboot")
+                # Cargamos de nuevo la lista de archivos creados aparentemente (tamano) validos
+                lista = os.listdir(ruta) # dir is your directory path
+                number_files = len(lista)
 
-                # Verificamos estado imagen 
+                number_files = number_files - number_filesOld
+                regLog("Archivos nuevos detectados... " + str(number_files))
 
-            else: # Imagenes generadas correctamente?
-                GPIO.output(led_verd,GPIO.HIGH)
-                numCapturasFallidas = 0
-                ultimoMinutoImagen = tiempo[4]
+                if number_files < 1:
+                    videoIn = (videoIn + 1) % maxVideo
+                    regLog("Falla video, probando otro puerto: " + str(videoIn))
+                    GPIO.output(led_rojo,GPIO.HIGH)
+                    cont = cont - 1     # Reiniciamos la captura anterior
+
+                    # Contador intentos fallidos de captura 
+                    numCapturasFallidas = numCapturasFallidas + 1
+
+                    if numCapturasFallidas > 3:
+                        # Falla en captura leve
+                        GPIO.output(led_rojo,GPIO.HIGH)
+                        if tipoCapturador[tipEstacion]:
+                            regLog("Reiniciando EasyCap...")
+                            GPIO.output(ena_easy,GPIO.LOW) # Des-activamos capturador
+                            sleep(10)
+                            GPIO.output(ena_easy,GPIO.HIGH) # Activamos capturador
+
+                    # Se evita perder datos de la estacion preguntanto si ya fue capturado el ultimo minuto
+                    if numCapturasFallidas > 10 and False:
+                        # Falla en captura permanente, reinicio Raspberry
+                        os.system("sudo reboot")
+
+                    # Verificamos estado imagen 
+
+                else: # Imagenes generadas correctamente?
+                    GPIO.output(led_verd,GPIO.HIGH)
+                    numCapturasFallidas = 0
+                    ultimoMinutoImagen = tiempo[4]
+            else:
+                sleep(1)
+                
 
 
         except Exception as e:
