@@ -21,7 +21,7 @@ fi
 #python /home/pi/allSky/allSkyVLC.py
 
 python /home/pi/meteoroPi/botonApagado/off_button.py &
-sh /home/pi/meteoroPi/arranque/launcher.sh > /home/pi/meteoroPi/arranque/logs/log.txt &
-sh /home/pi/meteoroPi/arranque/launcherWeb.sh > /home/pi/meteoroPi/arranque/logs/logWeb.txt &
+sh /home/pi/meteoroPi/arranque/launcher.sh & #> /home/pi/meteoroPi/arranque/logs/log.txt &
+sh /home/pi/meteoroPi/arranque/launcherWeb.sh & #> /home/pi/meteoroPi/arranque/logs/logWeb.txt &
 
 exit 0
