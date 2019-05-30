@@ -82,7 +82,7 @@ def ensure_USB(rUSB,f):
         if os.path.exists(rUSB):
             # USB conectada
             if not os.path.exists(d):
-                # USB no conectada
+                # USB conetada y nombre archivo no existe
                 os.makedirs(d)
                 uid =  pwd.getpwnam('pi').pw_uid
                 os.chown(d, uid, uid) # set user and group
@@ -94,6 +94,9 @@ def ensure_USB(rUSB,f):
         else:
             #Si usb no conectada
             regLog("USB: " + str(rUSB) + " no detectada")
+            # Corremos Script Remonte USB
+            os.system("sh " + rutaMeteoroPi + "remontUSB.sh")
+            regLog("Scrip Remonte USB ejecutado")
             # Posible procedimiento reconexion USB
             #sudo rm -r /media/pi/4D59-20AF
             #sudo mkdir /media/pi/4D59-20AF
