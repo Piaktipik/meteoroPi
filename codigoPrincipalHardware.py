@@ -67,7 +67,7 @@ def ensure_dir(f):
             os.makedirs(d)
             uid =  pwd.getpwnam('pi').pw_uid
             os.chown(d, uid, uid) # set user and group
-            os.system("sudo chmod 777 " + str(d))
+            os.system("sudo chmod +777 " + str(d))
             regLog("Ruta: " + f + " Creada" )
             
     except Exception as e:
@@ -86,7 +86,7 @@ def ensure_USB(rUSB,f):
                 os.makedirs(d)
                 uid =  pwd.getpwnam('pi').pw_uid
                 os.chown(d, uid, uid) # set user and group
-                os.system("sudo chmod 777 " + str(d))
+                os.system("sudo chmod +777 " + str(d))
                 regLog("Ruta: " + f + " Creada" )
                 #uid, gid =  pwd.getpwnam('pi').pw_uid, pwd.getpwnam('pi').pw_uid
                 #os.chown(d, uid, gid) # set user:group as root:pi
@@ -467,16 +467,17 @@ try:
     
     ######################################  Conteo de capturas
     num = "1"
+    cont = 1
     try: # Exepcion no existencia archivo
         file = open(rutaCon, "r")   
         num  = file.read() 
+        cont = int(num)
+        regLog("Conteo Cargado: " + str(num))
     except:
         ensure_dir(rutaCon)
         file = open(rutaCon, "w+")   # Se crea el archivo 
         file.write(num) 
         file.close() 
-    cont = int(num)
-    regLog("Conteo Cargado: " + str(num))
 
     ######################################  Variables verificacion conexion y funcionamiento
     videoIn = 0
