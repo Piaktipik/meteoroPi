@@ -18,11 +18,13 @@ tipEstacion = 0 # Tipo de estacion (Por defecto pruebas)
 # 1     :no         :no     :real       : no        : ITM
 # 2     :easycap    :si     :real       : no        : UdeA Oriente
 # 3     :no         :no     :simulada   : si        : Arduino Dugler
+# 4     :Raspy      :no     :simulada   : si        : Arduino Dugler
 
-tipoCapturador = [False,False,True,False] 
-tipoGPS        = [False,False,True,False]
-tipoDavis      = [False,True,True,False]
-tipoArduino    = [False,False,False,True]
+tipoCapturador = [False,False,True,False,False] # Easy Cap
+raspyCam       = [False,False,False,False,True] 
+tipoGPS        = [False,False,True,False,False]
+tipoDavis      = [False,True,True,False,False]
+tipoArduino    = [False,False,False,True,True]
 
 # Notas: GPS instalado en puerto serial GPIO raspberry
 
@@ -41,7 +43,7 @@ arcLogCapturaDavis = "logDavis"
 
 ###################################### Parametros Rutas:
 rutaMeteoroPi = "/home/pi/meteoroPi/"
-rutaImagenes = "/media/pi/4D59-20AF"
+rutaImagenes = "/home/pi/Desktop"
 
 carpetaConfigurciones = "config/"
 carpetaLogs = "logs/"
@@ -509,6 +511,11 @@ try:
             if tipoCapturador[tipEstacion]:
                 regLog("Capturando imagen EasyCap... ")
                 os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -S 40 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
+            
+            elif raspyCam[tipEstacion]:
+                regLog("Capturando imagen... ")
+                os.system("raspistill -o " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
+                
             else:
                 regLog("Capturando imagen... ")
                 os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
@@ -548,7 +555,7 @@ try:
                     if tamFile<180000:
                         os.system("sudo rm " + ruta + "/" + i)
                 else:
-                    if tamFile<50000:
+                    if tamFile<5000:                # Ajustar al tamano minimo de la camara
                         os.system("sudo rm " + ruta + "/" + i)
 
             # Cargamos de nuevo la lista de archivos creados aparentemente (tamano) validos
