@@ -69,7 +69,7 @@ def ensure_dir(f):
             os.makedirs(d)
             uid =  pwd.getpwnam('pi').pw_uid
             os.chown(d, uid, uid) # set user and group
-            os.system("sudo chmod 777 " + str(d))
+            os.system("sudo chmod +777 " + str(d))
             regLog("Ruta: " + f + " Creada" )
             
     except Exception as e:
@@ -81,29 +81,48 @@ def ensure_USB(rUSB,f):
     try:
         pUSB = os.path.dirname(rUSB)
         d = os.path.dirname(f)
-        if os.path.exists(pUSB):
+        if os.path.exists(rUSB):
             # USB conectada
             if not os.path.exists(d):
-                # USB no conectada
+                # USB conetada y nombre archivo no existe
                 os.makedirs(d)
                 uid =  pwd.getpwnam('pi').pw_uid
                 os.chown(d, uid, uid) # set user and group
-                os.system("sudo chmod 777 " + str(d))
+                os.system("sudo chmod +777 " + str(d))
                 regLog("Ruta: " + f + " Creada" )
                 #uid, gid =  pwd.getpwnam('pi').pw_uid, pwd.getpwnam('pi').pw_uid
                 #os.chown(d, uid, gid) # set user:group as root:pi
+            return True
         else:
             #Si usb no conectada
             regLog("USB: " + str(rUSB) + " no detectada")
+            # Corremos Script Remonte USB
+            os.system("sh " + rutaMeteoroPi + "remontUSB.sh")
+            regLog("Scrip Remonte USB ejecutado")
             # Posible procedimiento reconexion USB
+            #sudo rm -r /media/pi/4D59-20AF
             #sudo mkdir /media/pi/4D59-20AF
             #sudo umount /dev/sda1
             #sudo mount -t vfat /dev/sda1 /media/pi/4D59-20AF/ -o uid=1000
+            #sudo mount -t vfat /dev/sdb1 /media/pi/4D59-20AF/ -o uid=1000
             
             # Estrategia de almacenamiento alterna - reiniciar?
     except Exception as e:
         # Error log
         regLog('Error ensure_USB: ' + str(e))
+    return False
+
+def moverAUSB():
+    regLog("Moviendo archivos: " + f + " ... " )
+    try:
+        # si esta conectada la USB intentamos mover los arhivos a esta
+        os.system("sudo mv -r /home/pi/Desktop/" + carpetaImagenes + " " + rutaImg)
+    except Exception as e:
+        # Error log
+        regLog('Error moverAUSB: ' + str(e))
+    
+
+########################################### Logs
 
 # Registro actividad en .txt y consola
 def regLog(texto):
@@ -450,16 +469,17 @@ try:
     
     ######################################  Conteo de capturas
     num = "1"
+    cont = 1
     try: # Exepcion no existencia archivo
         file = open(rutaCon, "r")   
         num  = file.read() 
+        cont = int(num)
+        regLog("Conteo Cargado: " + str(num))
     except:
         ensure_dir(rutaCon)
         file = open(rutaCon, "w+")   # Se crea el archivo 
         file.write(num) 
         file.close() 
-    cont = int(num)
-    regLog("Conteo Cargado: " + str(num))
 
     ######################################  Variables verificacion conexion y funcionamiento
     videoIn = 0
@@ -494,6 +514,7 @@ try:
 
             # Creamos sistema de archivos
             ruta =  rutaImg + 'A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + 'D' + "%02d"%tiempo[2] + '/' 
+
             ensure_USB(rutaImagenes,ruta)
 
             # Se carga el tiempo
@@ -519,8 +540,7 @@ try:
             else:
                 regLog("Capturando imagen... ")
                 os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
-            
-            
+        
             
             # Esperamos que capture un par de escenas
             #regLog("Capturando... " + str(tcap) + ' Segundos')
