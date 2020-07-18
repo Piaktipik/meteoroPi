@@ -31,6 +31,7 @@ tipoArduino    = [False,False,False,True,True]
 ###################################### Parametros Muestreo:
 tcap = 5 # Tiempo caputura fotogramas en segundos
 tencap = 54 # Tiempo entre capturas en segundos
+velSerial = 115200 # Velocidad serial del sensor conectado
 
 ###################################### Parametros Nombres archivos:
 # Se indican los nombres de los archivos 
@@ -277,7 +278,7 @@ def capturaEstacion():
         try:
             
             # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
-            while ultimoMinuto == tiempo[4]:
+            while ultimoMinuto == tiempo[5]:
                 tiempo = actualizarTiempo()
                 sleep(1)
 
@@ -287,11 +288,24 @@ def capturaEstacion():
 
                 ###################################### Solicitamos una trama LOOP a la estacion:
                 if tipoArduino[tipEstacion]:
-                    regLog('Leyendo Arduino: ')
-                    x = ser.readline()          # read line
+                    
+                    regLogD('Leyendo Arduino: ')
+                    try:
+                        x = ser.readline()          # read line
+                    except Exception as e:
+                        regLogD('Error puerto serial: ' + str(e.args))
+                        serialOperativo = False
+                        
                     #ser.flush()
                     regLogD('Lectura: ')
                     regLogD(x)
+                    
+                    regLogD('Tamano lectura: ')
+                    regLogD(str(len(x)))
+                    
+                    if(len(x)<100):
+                        serialOperativo = False
+                        continue
                     
                     # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
                     ruta = rutaDatos + 'arduino/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
@@ -302,7 +316,7 @@ def capturaEstacion():
                     while (ser.in_waiting > 0):
                         ser.read()
                     
-                    regLog('Solicitando LOOP: ')
+                    regLogD('Solicitando LOOP: ')
                     ser.write(b'\n')
                     ser.write(b'\n')
                     sleep(0.1)
@@ -394,7 +408,7 @@ def capturaEstacion():
                 regLog('Datos Guardados')
 
                 # Todo ha salido bien!, indicamos que ya se guardo datos para este minuto
-                ultimoMinuto = tiempo[4]
+                ultimoMinuto = tiempo[5]
                 
             # Si no hay conexion serial:
             else:
@@ -407,7 +421,7 @@ def capturaEstacion():
                     
                     # Se crea el puerto
                     if tipoArduino[tipEstacion]:
-                        ser = serial.Serial(puertoSerial[nPuertoSerial], 9600, timeout=5)
+                        ser = serial.Serial(puertoSerial[nPuertoSerial], velSerial, timeout=5)
                     else:
                         ser = serial.Serial(puertoSerial[nPuertoSerial], 19200, timeout=5)
                     # Se reporta el puerto iniciado
