@@ -278,7 +278,7 @@ def capturaEstacion():
         try:
             
             # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
-            while ultimoMinuto == tiempo[5]:
+            while ultimoMinuto == tiempo[5]: # Cada 10 minutos
                 tiempo = actualizarTiempo()
                 sleep(1)
 
@@ -519,7 +519,7 @@ try:
             #    esperar = True      # activamos nuevamente la espera
             
              # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
-            while ultimoMinutoImagen == tiempo[4]:
+            while ultimoMinutoImagen == tiempo[3]: # Imagen cada 10 minutos
                 tiempo = actualizarTiempo()
                 sleep(1)
 
