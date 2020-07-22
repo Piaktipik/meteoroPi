@@ -316,7 +316,7 @@ def capturaEstacion():
                     while (ser.in_waiting > 0):
                         ser.read()
                     
-                    regLogD('Solicitando LOOP: ')
+                    #regLogD('Solicitando LOOP: ')
                     ser.write(b'\n')
                     ser.write(b'\n')
                     sleep(0.1)
@@ -325,8 +325,8 @@ def capturaEstacion():
                     # Leemos la trama LOOP 
                     x = ser.read(100)          # read 99 bytes
                     ser.flush()
-                    regLogD('Lectura: ')
-                    regLogD(x)
+                    #regLogD('Lectura: ')
+                    #regLogD(x)
 
                     # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
                     ruta = rutaDatos + 'davis/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
@@ -338,7 +338,7 @@ def capturaEstacion():
                 # En formato pandas YY-MM-DD HH:MM:SS para la captura actual
                 tiempoStr = str(tiempo[0]) + '-' + "%02d"%tiempo[1] + '-' + "%02d"%tiempo[2]  + ' ' + "%02d"%tiempo[3] + ':' + "%02d"%tiempo[4] + ':' + "%02d"%tiempo[5] 
                 # Se reporta tiempo captura
-                regLog("nCaptura... " + ruta + " T: " + tiempoStr + " Procesando trama...")
+                #regLogD("nCaptura... " + ruta + " T: " + tiempoStr + " Procesando trama...")
 
                 Datos = [tiempoStr]     # Cargamos el tiempo como primera columna
                 
@@ -371,7 +371,7 @@ def capturaEstacion():
                                 Datos.append(aux)
                     else:
                         # Si no es correcto se solicita un nuevo paquete
-                        regLog('# Datos < 100, Captura Incompleta... Reintentando')
+                        regLogD('# Datos < 100, Captura Incompleta... Reintentando')
                         continue
                 
                 
@@ -385,7 +385,7 @@ def capturaEstacion():
                     open(fileName, 'rb')
                 except:
                     # Archivo no existe, lo creamos
-                    print('Error apertura... Creando archivo')
+                    regLogD('Error apertura... Creando archivo')
                     writer = csv.writer(open(fileName, 'w'))
                     
                     if tipoArduino[tipEstacion]:
@@ -405,15 +405,15 @@ def capturaEstacion():
                 writer = csv.writer(open(fileName, 'a'))
                 #regLog('Datos a escribir: ' + str(Datos))
                 writer.writerow(Datos)
-                regLog('Datos Guardados')
 
+                regLogD('Datos Ok!')
                 # Todo ha salido bien!, indicamos que ya se guardo datos para este minuto
                 ultimoMinuto = tiempo[5]
                 
             # Si no hay conexion serial:
             else:
                 # Se reporta el puerto a iniciar
-                regLog('Iniciado Puerto... ' + puertoSerial[nPuertoSerial])
+                regLogD('Iniciado Puerto... ' + puertoSerial[nPuertoSerial])
                 try:
                     if not tipoGPS[tipEstacion]:
                         # Forzamos la detencion de la libreria GPS, ya que por defecto ocupa el puerto serial de la estacion
@@ -425,21 +425,21 @@ def capturaEstacion():
                     else:
                         ser = serial.Serial(puertoSerial[nPuertoSerial], 19200, timeout=5)
                     # Se reporta el puerto iniciado
-                    regLog(ser.name)
+                    regLogD(ser.name)
                     serialOperativo = True
-                    regLog('Iniciado')
+                    regLogD('Iniciado')
 
                 except Exception as e:
                     # Si ocurre un error iniciando el puerto serial, lo reportamos
                     serialOperativo = False
                     # Probamos otro puerto:
                     nPuertoSerial = (nPuertoSerial + 1) % len(puertoSerial)
-                    regLog('Error iniciando: Argumentos: ' + str(e.args) + 'Probando puerto: '+ str(puertoSerial[nPuertoSerial]))
+                    regLogD('Error iniciando: Argumentos: ' + str(e.args) + 'Probando puerto: '+ str(puertoSerial[nPuertoSerial]))
                     
                     
         except Exception as e:
             # Si ocurre un error general en el codigo de la estacion, lo reportamos
-            regLog('Error Scrip Estacion: Argumentos: ' + str(e.args))
+            regLogD('Error Scrip Estacion: Argumentos: ' + str(e.args))
             sleep(1)
 
         # Esperamos para realizar la proxima solicitud
@@ -519,7 +519,7 @@ try:
             #    esperar = True      # activamos nuevamente la espera
             
              # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
-            while ultimoMinutoImagen == tiempo[3]: # Imagen cada 10 minutos
+            while ultimoMinutoImagen == (tiempo[4]//15): # Imagen cada 10 minutos
                 tiempo = actualizarTiempo()
                 sleep(1)
 
@@ -627,7 +627,7 @@ try:
             else: # Imagenes generadas correctamente?
                 GPIO.output(led_verd,GPIO.HIGH)
                 numCapturasFallidas = 0
-                ultimoMinutoImagen = tiempo[4]
+                ultimoMinutoImagen = (tiempo[4]//15)
 
 
         except Exception as e:
