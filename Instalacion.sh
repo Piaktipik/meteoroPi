@@ -14,6 +14,10 @@
 #echo "@reboot sh /home/pi/meteoroPi/Arranque/launcher.sh > /home/pi/meteoroPi/Arranque/logs/cronlog.txt 2>&1" >>
 #echo "@reboot sh /home/pi/meteoroPi/Arranque/launcherWeb.sh > /home/pi/meteoroPi/Arranque/logs/cronlogWeb.txt 2>&1" >>
 
+python /home/pi/meteoroPi/botonApagado/off_button.py &
+sh /home/pi/meteoroPi/arranque/launcher.sh > /home/pi/meteoroPi/arranque/logs/log.txt &
+sh /home/pi/meteoroPi/arranque/launcherWeb.sh > /home/pi/meteoroPi/arranque/logs/logWeb.txt &
+
 
 # Se activa el apagado por puerto raspberry (deve ser agregado en /etc/rc.local antes del exit!)
 #sudo apt-get install pycd me    thon-dev python-rpi.gpiocd meteoroPi

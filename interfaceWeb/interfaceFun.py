@@ -14,7 +14,7 @@ eventlet.monkey_patch()
 
 # Librerias Auxiliares
 import time
-from RF24 import *
+#from RF24 import *
 import RPi.GPIO as GPIO
 import os
 import serial
