@@ -27,6 +27,7 @@ tipoDavis      = [False,True,True]
 ###################################### Parametros Muestreo:
 tcap = 5 # Tiempo caputura fotogramas en segundos
 tencap = 54 # Tiempo entre capturas en segundos
+maxCap = 99 # Porcentaje de memoria ocupado antes de detener captura.
 
 ###################################### Parametros Nombres archivos:
 # Se indican los nombres de los archivos 
@@ -39,7 +40,7 @@ arcLogCapturaDavis = "logDavis"
 
 ###################################### Parametros Rutas:
 rutaMeteoroPi = "/home/pi/meteoroPi/"
-rutaImagenes = "/media/pi/FOTOS"
+rutaImagenes = "/home/pi/Desktop/FOTOS"
 USBok = False
 
 carpetaConfigurciones = "config/"
@@ -65,7 +66,7 @@ def haySpace():
         i = i + 1
         line = df.readline()
         if i==2:
-			return int(line.split()[0:6][4][0:2])<94
+			return int(line.split()[0:6][4][0:2])<maxCap
             
 # Verificacion rutas guardado archivos
 def ensure_dir(f):
