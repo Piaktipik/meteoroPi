@@ -26,7 +26,9 @@ Estabilizar version en modulos activos
 
 # Python Packages requeridos:
 sudo apt-get install gpsd gpsd-clients python-gps pps-tools
+
 sudo apt-get install fswebcam
+
 sudo apt-get install mencoder
 
 # 3rd Party Sensor Modules:
