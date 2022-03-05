@@ -21,12 +21,13 @@ bash Instalacion.sh
 
 nano ~/meteoroPi/config/estacion.txt
 
-Tipo  :Capturador :GPS    :Davis      :Arduino    : Caso
-0     :no         :no     :simulada   : no        : Pruebas / Desarollo (requiere arduino para simular trama estacion Davis)
-1     :no         :no     :real       : no        : ITM
-2     :easycap    :si     :real       : no        : UdeA Oriente
-3     :no         :no     :no         : si        : Arduino 
-4     :Raspy      :no     :no         : si        : Arduino con RaspiCam
+|         Tipo         | Capturador :GPS | :Davis |  :Arduino | : Caso | Descripcion       |
+|:--------------------:|:---------------:|:------:|:---------:|--------|----------------------------------------------------------------------------|
+|           0          |        no       |   :no  | :simulada | : no   | : Pruebas / Desarollo (requiere arduino para simular trama estacion Davis) |
+|           1          |        no       |   :no  |   :real   | : no   | : ITM                                                                      |
+|           2          |     :easycap    |   :si  |   :real   | : no   | : UdeA Oriente                                                             |
+|           3          |       :no       |   :no  |    :no    | : si   | : Arduino                                                                  |
+|           4          |      :Raspy     |   :no  |    :no    | : si   | : Arduino con RaspiCam                                                     |
 
 ## Instalar librerias
 
