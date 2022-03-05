@@ -56,6 +56,7 @@ screen /dev/ttyUSB0 19200
 
 ### Para solicitar un mensaje a la Davis teclear (incluir espacio y enter al final):
 LOOP 1 -> si la estacion Davis esta operativa, la respuesta es algo como: LOO@u�A0����������������`������������������PKd
+check codecs: https://docs.python.org/2.4/lib/standard-encodings.html
 
 ### Para cerrar SCREEN :
 "Ctrl+a" y luego "\" seguido de yes "y"
