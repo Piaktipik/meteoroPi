@@ -278,7 +278,7 @@ def capturaEstacion():
         try:
             
             # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
-            while ultimoMinuto == tiempo[5]: # Cada 10 minutos
+            while ultimoMinuto == tiempo[5]: # Cada minuto
                 tiempo = actualizarTiempo()
                 sleep(1)
 
@@ -409,7 +409,7 @@ def capturaEstacion():
 
                 regLogD('Datos Ok!')
                 # Todo ha salido bien!, indicamos que ya se guardo datos para este minuto
-                ultimoMinuto = tiempo[5]
+                ultimoMinuto = tiempo[4]
                 
             # Si no hay conexion serial:
             else:
