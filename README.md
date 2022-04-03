@@ -39,7 +39,7 @@ sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install fswebcam
 sudo apt-get install mencoder
-sudo apt-get install gpsd gpsd-clients python3-gps pps-tools
+sudo apt-get install gpsd gpsd-clients python-gps pps-tools
 sudo apt-get install screen
 ```
 
