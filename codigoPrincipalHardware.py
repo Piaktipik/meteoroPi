@@ -586,13 +586,17 @@ try:
 
                 # Removemos los Vacios o defectuosos(< detemrinados bytes)
                 if tipoCapturador[tipEstacion]:
-                    if tamFile<1000:
+                    if tamFile<13000:
+                        regLog("Imagen: " + i + ", Size:" + str(tamFile)+ " invalida...")
                         os.system("sudo rm " + ruta + "/" + i)
-                        regLog("Imagen: " + i + " invalida, elminada.")
+                        regLog("Elminada.")
+                        
                 else:
                     if tamFile<5000:                # Ajustar al tamano minimo de la camara
+                        regLog("Imagen: " + i + ", Size:" + str(tamFile)+ " invalida...")
                         os.system("sudo rm " + ruta + "/" + i)
-                        regLog("Imagen: " + i + " invalida, elminada.")
+                        regLog("Elminada.")
+                        
 
             # Cargamos de nuevo la lista de archivos creados aparentemente (tamano) validos
             lista = os.listdir(ruta) # dir is your directory path
