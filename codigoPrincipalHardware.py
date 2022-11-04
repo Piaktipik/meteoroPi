@@ -278,7 +278,7 @@ def capturaEstacion():
         try:
             
             # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
-            while ultimoMinuto == tiempo[5]: # Cada 10 minutos
+            while ultimoMinuto == tiempo[4]: # Cada 10 minutos
                 tiempo = actualizarTiempo()
                 sleep(1)
 
@@ -408,7 +408,7 @@ def capturaEstacion():
 
                 regLogD('Datos Ok!')
                 # Todo ha salido bien!, indicamos que ya se guardo datos para este minuto
-                ultimoMinuto = tiempo[5]
+                ultimoMinuto = tiempo[4]
                 
             # Si no hay conexion serial:
             else:
@@ -519,7 +519,7 @@ try:
             #    esperar = True      # activamos nuevamente la espera
             
              # Si ultimo minuto ya fue capturado, actualizamos el tiempo y esperamos
-            while ultimoMinutoImagen == (tiempo[4]//15): # Imagen cada 10 minutos
+            while ultimoMinutoImagen == (tiempo[4]//5): # Imagen cada 10 minutos
                 tiempo = actualizarTiempo()
                 sleep(1)
 
@@ -555,7 +555,7 @@ try:
                 regLog("Capturando imagen... ")
                 os.system("fswebcam  -d /dev/video" + str(videoIn) + "  -r 1920x1080 -q --no-banner " + str(ruta) + tiempoStr + "-C" + str(cont) + ".jpg")
         
-            
+            regLog("Verificando imagen...")
             # Esperamos que capture un par de escenas
             #regLog("Capturando... " + str(tcap) + ' Segundos')
             #sleep(tcap)		#dormimos el resto de tiempo hasta timeEntreF
@@ -586,11 +586,13 @@ try:
 
                 # Removemos los Vacios o defectuosos(< detemrinados bytes)
                 if tipoCapturador[tipEstacion]:
-                    if tamFile<180000:
+                    if tamFile<1000:
                         os.system("sudo rm " + ruta + "/" + i)
+                        regLog("Imagen: " + i + " invalida, elminada.")
                 else:
                     if tamFile<5000:                # Ajustar al tamano minimo de la camara
                         os.system("sudo rm " + ruta + "/" + i)
+                        regLog("Imagen: " + i + " invalida, elminada.")
 
             # Cargamos de nuevo la lista de archivos creados aparentemente (tamano) validos
             lista = os.listdir(ruta) # dir is your directory path
@@ -616,6 +618,7 @@ try:
                         GPIO.output(ena_easy,GPIO.LOW) # Des-activamos capturador
                         sleep(10)
                         GPIO.output(ena_easy,GPIO.HIGH) # Activamos capturador
+                        regLog("EasyCap Reiniciado.")
 
                 # Se evita perder datos de la estacion preguntanto si ya fue capturado el ultimo minuto
                 if numCapturasFallidas > 10 and False:
@@ -627,7 +630,7 @@ try:
             else: # Imagenes generadas correctamente?
                 GPIO.output(led_verd,GPIO.HIGH)
                 numCapturasFallidas = 0
-                ultimoMinutoImagen = (tiempo[4]//15)
+                ultimoMinutoImagen = (tiempo[4]//5)
 
 
         except Exception as e:
