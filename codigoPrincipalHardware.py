@@ -273,7 +273,7 @@ def capturaEstacion():
     
     nPuertoSerial = 0
     while(1):
-        regLog('*')
+        regLogD('*')
         # Intentamos correr el codigo de captura de datos de la estacion Davis
         try:
             
@@ -281,7 +281,7 @@ def capturaEstacion():
             while ultimoMinuto == tiempo[4]: # Cada 10 minutos
                 tiempo = actualizarTiempo()
                 sleep(1)
-
+            regLogD('TLeer')
             # Pasado un minuto procedemos a solicitar un dato de la estacion
             if serialOperativo:
                 # Si la comunicacion serial esta activa ->
@@ -289,7 +289,7 @@ def capturaEstacion():
                 ###################################### Solicitamos una trama LOOP a la estacion:
                 if tipoArduino[tipEstacion]:
                     
-                    regLogD('Leyendo Arduino: ')
+                    regLogD('Arduino:')
                     try:
                         x = ser.readline()          # read line
                     except Exception as e:
@@ -303,16 +303,12 @@ def capturaEstacion():
                     regLogD('Tamano lectura: ')
                     regLogD(str(len(x)))
                     
-                    if(len(x)<100):
-                        serialOperativo = False
-                        continue
-                    
                     # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
                     ruta = rutaDatos + 'arduino/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
-                    ensure_dir(ruta)
                 
                 else:
                     # Vaciamos buffer puerto Serial
+                    regLogD('Davis:')
                     while (ser.in_waiting > 0):
                         ser.read()
                     
@@ -331,8 +327,14 @@ def capturaEstacion():
 
                     # Creamos sistema de archivos para almacenar los datos de la estacion Davis:
                     ruta = rutaDatos + 'davis/A' + str(tiempo[0]) + 'M' + "%02d"%tiempo[1] + '/'
-                    ensure_dir(ruta)
-
+                
+                ## Aseguramos el mensaje tiene contenido
+                if(len(x)<100):
+                    serialOperativo = False
+                    continue
+                # Si hay contenido, iniciamos preparativos para guardar
+                ensure_dir(ruta)
+                        
                 ###################################### Se carga el tiempo 
                 # En el nombre del archivo  en formato pandas YY-MM-DD HH:MM:SS
                 nombreArchivo = 'DatosEstacion' + str(tiempo[0]) + '-' + "%02d"%tiempo[1] + '-' + "%02d"%tiempo[2] 
@@ -441,6 +443,7 @@ def capturaEstacion():
         except Exception as e:
             # Si ocurre un error general en el codigo de la estacion, lo reportamos
             regLogD('Error Scrip Estacion: Argumentos: ' + str(e.args))
+            serialOperativo = False
             sleep(1)
 
         # Esperamos para realizar la proxima solicitud
@@ -523,7 +526,7 @@ try:
             while ultimoMinutoImagen == (tiempo[4]//5): # Imagen cada 10 minutos
                 tiempo = actualizarTiempo()
                 sleep(1)
-
+            regLog('Capturando...')
             # Empiezo nueva captura 
             GPIO.output(led_verd,GPIO.LOW)
 
