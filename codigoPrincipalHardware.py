@@ -323,7 +323,8 @@ def capturaEstacion():
                     ser.write(b'LOOP 1') 
                     sleep(0.1)
                     # Leemos la trama LOOP 
-                    x = ser.read(100)          # read 99 bytes
+                    y = ser.read(100)          # read 99 bytes
+                    x=y.decode("latin-1")
                     ser.flush()
                     #regLogD('Lectura: ')
                     #regLogD(x)
