@@ -43,8 +43,10 @@ arcLogCapturaImagen = "logCam"
 arcLogCapturaDavis = "logDavis"
 
 ###################################### Parametros Rutas:
-rutaMeteoroPi = "/home/pi/meteoroPi/"
-rutaImagenes = "/home/pi/Desktop"
+userName = "pi"
+rutaMeteoroPi = f'/home/{userName}/meteoroPi/'
+rutaImagenes = f'/home/{userName}/Desktop'
+
 
 carpetaConfigurciones = "config/"
 carpetaLogs = "logs/"
@@ -68,7 +70,7 @@ def ensure_dir(f):
         if not os.path.exists(d):
             regLog("Creando Ruta: " + f + " ... " )
             os.makedirs(d)
-            uid =  pwd.getpwnam('pi').pw_uid
+            uid =  pwd.getpwnam(userName).pw_uid
             os.chown(d, uid, uid) # set user and group
             os.system("sudo chmod +777 " + str(d))
             regLog("Ruta: " + f + " Creada" )
@@ -87,7 +89,7 @@ def ensure_USB(rUSB,f):
             if not os.path.exists(d):
                 # USB conetada y nombre archivo no existe
                 os.makedirs(d)
-                uid =  pwd.getpwnam('pi').pw_uid
+                uid =  pwd.getpwnam(userName).pw_uid
                 os.chown(d, uid, uid) # set user and group
                 os.system("sudo chmod +777 " + str(d))
                 regLog("Ruta: " + f + " Creada" )
@@ -117,7 +119,7 @@ def moverAUSB():
     regLog("Moviendo archivos: " + f + " ... " )
     try:
         # si esta conectada la USB intentamos mover los arhivos a esta
-        os.system("sudo mv -r /home/pi/Desktop/" + carpetaImagenes + " " + rutaImg)
+        os.system("sudo mv -r " + rutaImagenes + "/" + carpetaImagenes + " " + rutaImg)
     except Exception as e:
         # Error log
         regLog('Error moverAUSB: ' + str(e))
